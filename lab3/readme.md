@@ -2,12 +2,12 @@
 
 > {sub-ref}`today` | {sub-ref}`wordcount-minutes` min to read
 
-**Attribute-based encryption (ABE)** is a kind of algorithm of public key cryptography in which the private key is used to decrypt data is dependent on certain user attributes such as position, place of residence, type of account [^cryto]. The idea of encryption attribute was first published in [*Fuzzy Identity-Based Encryption*](http://web.cs.ucla.edu/~sahai/work/web/2005%20Publications/Eurocrypt2005.pdf) and then developed as [*Attribute-Based Encryption for Fine-Grained Access Control of Encrypted Data*](https://web.cs.ucdavis.edu/~franklin/ecs228/pubs/abe.pdf).
+**Attribute-based encryption (ABE)** is a kind of algorithm of public-key cryptography in which the private key is used to decrypt data is dependent on certain user attributes such as position, place of residence, type of account [^cryto]. The idea of encryption attribute was first published in [*Fuzzy Identity-Based Encryption*](http://web.cs.ucla.edu/~sahai/work/web/2005%20Publications/Eurocrypt2005.pdf) and then developed as [*Attribute-Based Encryption for Fine-Grained Access Control of Encrypted Data*](https://web.cs.ucdavis.edu/~franklin/ecs228/pubs/abe.pdf).
 
 [^cryto]: Attribute-based encryption: http://cryptowiki.net/index.php?title=Attribute-based_encryption
 
 
-## Set up
+## Set-up
 
 ### Install OpenABE
 
@@ -75,3 +75,44 @@ $ oabe_setup
 
 [^manual]: OpenABE CLI Util Document: https://github.com/zeutro/openabe/blob/master/docs/libopenabe-v1.0.0-cli-doc.pdf
 
+## Ciphertext-Policy Attribute-based Encryption (CP-ABE)
+
+In a CP-ABE system (i.e. *role-based access control*), attributes are associated with users, while policies are associated with ciphertexts. A user can decrypy a certain ciphertext **if and only if** her attributes satisfy the policy.
+
+For instance, we have three users:
+
+Name | Age | Apartment 
+---------|----------|---------
+TDKR | 24 | Swimming club
+MUR | 21 | Karate club
+KMR | 25 | Karate club
+
+A confidential document about Karate is encrypted, whose content can only be viewed by those users that belong to Karate club and have an age >= 24. In other words, only KMR can decrypt the file, TDKR or MUR cannot.
+
+```sh
+# generate a CP-ABE system with "inm" as its file name prefix
+$ oabe_setup -s CP -p inm
+
+# generate key for TDKR, MUR, and KMR with their attributes
+$ oabe_keygen -s CP -p inm -i "Age=24|Swimming-club" -o TDKR_key
+$ oabe_keygen -s CP -p inm -i "Age=21|Karate-club" -o MUR_key
+$ oabe_keygen -s CP -p inm -i "Age=25|Karate-club" -o KMR_key
+
+# Write a secret message into input.txt
+$ echo "114514" > input.txt
+# Encrpyt the file
+$ oabe_enc -s CP -p inm -e "((Age > 22) and (Karate-club))" -i input.txt -o output.cpabe
+```
+
+Let's check:
+
+```sh
+# TDKR decrypts with TDKR's key -- should fail
+$ oabe_dec -s CP -p inm -k TDKR_key.key -i output.cpabe -o TDKR_plain.txt
+
+# MUR decrypts with MUR's key -- should fail
+$ oabe_dec -s CP -p inm -k MUR_key.key -i output.cpabe -o MUR_plain.txt
+
+# KMR decrypts with KMR's key -- should pass
+$ oabe_dec -s CP -p inm -k KMR_key.key -i output.cpabe -o KMR_plain.txt
+```
