@@ -77,7 +77,7 @@ $ oabe_setup
 
 ## Ciphertext-Policy Attribute-based Encryption (CP-ABE)
 
-In a CP-ABE system (i.e. *role-based access control*), attributes are associated with users, while policies are associated with ciphertexts. A user can decrypy a certain ciphertext **if and only if** her attributes satisfy the policy.
+In a CP-ABE (i.e. *role-based access control*) system , attributes are associated with users, while policies are associated with ciphertexts. A user can decrypt a certain ciphertext **if and only if** her attributes satisfy the policy.
 
 For instance, we have three users:
 
@@ -115,4 +115,41 @@ $ oabe_dec -s CP -p inm -k MUR_key.key -i output.cpabe -o MUR_plain.txt
 
 # KMR decrypts with KMR's key -- should pass
 $ oabe_dec -s CP -p inm -k KMR_key.key -i output.cpabe -o KMR_plain.txt
+$ cat KMR_plain.txt
+```
+
+## Key-Policy Attribute-based Encryption (KP-ABE)
+
+In a KP-ABE (i.e. *content-based access control*) system, policies are associated with users (i.e. their private keys), while attributes are associated with ciphertexts. A user can decrypt a ciphertext **if and only if** its attributes satisfy her (private key's) policy.
+
+For example, as an employee of COAT corporation, TDKR can only access the emails to himself during his career in COAT (suppose Aug 1 - 31, 2019), which constructs his private key to decrypt files. All emails inside COAT are encrypted with their attributes (e.g. from, to, date, etc.) right after sent.
+
+```sh
+# generate a KP-ABE system with "COAT" as its file name prefix
+$ oabe_setup -s KP -p COAT
+
+# generate key slice for TDKR
+$ oabe_keygen -s KP -p COAT -i "(To:TDKR and (Date = Aug 1-31, 2019))" -o TDKR_KP
+
+# encrypt emails to different people at different time with their metadata
+$ echo "Invitation to my big house this weekend." > input1.txt
+$ oabe_enc -s KP -p COAT -e "From:TON|To:TDKR|Date=Aug 10,2019" -i input1.txt -o input1.kpabe
+$ echo "How do you like CrossFit?" > input2.txt
+$ oabe_enc -s KP -p COAT -e "From:Batman|To:TDKR|Date=May 14,2021" -i input2.txt -o input2.kpabe
+$ echo "Let's go to have a drink!" > input3.txt
+$ oabe_enc -s KP -p COAT -e "From:KMR|To:MUR|Date=Aug 14,2020" -i input3.txt -o input3.kpabe
+```
+
+Let's verify
+
+```sh
+# decrypt the first email -- should pass
+$ oabe_dec -s KP -p COAT -k TDKR_KP.key -i input1.kpabe -o input1_plain.txt
+$ cat input1_plain.txt
+
+# decrypt the second email -- should fail (date mismatches)
+$ oabe_dec -s KP -p COAT -k TDKR_KP.key -i input2.kpabe -o input2_plain.txt
+
+# decrypt the second email -- should fail (receiver mismatches)
+$ oabe_dec -s KP -p COAT -k TDKR_KP.key -i input3.kpabe -o input3_plain.txt
 ```
