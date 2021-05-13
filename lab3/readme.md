@@ -140,7 +140,7 @@ $ echo "Let's go to have a drink!" > input3.txt
 $ oabe_enc -s KP -p COAT -e "From:KMR|To:MUR|Date=Aug 14,2020" -i input3.txt -o input3.kpabe
 ```
 
-Let's verify
+Let's verify:
 
 ```sh
 # decrypt the first email -- should pass
