@@ -45,6 +45,23 @@ $ pheutil --version
 ```
 ````
 
+
+````{tabbed} C++
+Install [HElib](https://homenc.github.io/HElib/) (v2.1.0)
+
+```
+$ wget https://github.com/homenc/HElib/archive/refs/tags/v2.1.0.tar.gz
+$ tar xzvf v2.1.0.tar.gz
+$ cd HElib-2.1.0
+$ mkdir build
+$ cd build
+$ cmake -DPACKAGE_BUILD=ON -DCMAKE_INSTALL_PREFIX=~/helib_install ..
+$ make
+$ make install
+```
+
+````
+
 ## Basic Property
 
 `````{tabbed} Python
