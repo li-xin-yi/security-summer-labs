@@ -29,6 +29,12 @@ Install [python-paillier](https://github.com/data61/python-paillier):
 $ pip install phe
 ```
 
+Install [Pyfhel](https://github.com/ibarrond/Pyfhel)
+
+```
+$ pip install Pyfhel
+```
+
 ````
 
 ````{tabbed} CLI
@@ -43,6 +49,7 @@ Check:
 ```
 $ pheutil --version
 ```
+
 ````
 
 
