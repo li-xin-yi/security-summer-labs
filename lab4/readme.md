@@ -71,11 +71,15 @@ $ make install
 
 ## Basic Property
 
-`````{tabbed} Python
-Run `basic.py`
+### Partially HE
 
-```{literalinclude} basic.py
+`````{tabbed} Python
+
+Source code: {download}`partially-basic.py`
+
+```{literalinclude} partially-basic.py
 :language: python
+:linenos:
 ```
 
 ````{warning}
@@ -140,4 +144,20 @@ $ pheutil multiply public_key.json num1.enc 3
 
 ````
 
+`````
+
+### Fully HE
+
+`````{tabbed} Python
+
+Source code: {download}`fully-basic.py`
+
+```{literalinclude} fully-basic.py
+:language: python
+:linenos:
+```
+
+````{important}
+The ciphertext length of an integer is 32828, encryted `114` and `514` share 28528 identical bytes.
+````
 `````
