@@ -122,7 +122,7 @@ Their difference is encrypted as 1cdb92c04dee1573bea5d2448d43728f64a51bcecbe242f
 decrypted difference: 400
 ```
 
-Multiple ($De(k \cdot En(n))=kn$)
+Multiply ($De(k \cdot En(n))=kn$)
 
 ```py
 >>> cipher_product = num1 * 3
@@ -203,10 +203,68 @@ $ pheutil multiply public_key.json num1.enc 3
 
 Source code: {download}`fully-basic.py`
 
-```{literalinclude} fully-basic.py
+Create an empty `Pyfhel` object
+
+```py
+>>> from Pyfhel import Pyfhel
+>>> HE = Pyfhel()
+```
+
+Initialize a context with plaintext modulo 65537 and generate a public/private key pair
+
+```py
+>>> HE.contextGen(p=65537)
+>>> HE.keyGen()
+```
+
+Encrypt 114 and 514, then print the last 16 bytes of the ciphertexts
+
+```py
+>>> num1 = HE.encryptInt(114)
+>>> num2 = HE.encryptInt(514)
+>>> print(f"114 is encrypted as ...{num1.to_bytes()[-16:].hex()}")
+>>> print(f"514 is encrypted as ...{num2.to_bytes()[-16:].hex()}")
+114 is encrypted as ...7c66aaf3cd2d15000000000000000000
+514 is encrypted as ...f01210914a5c23000000000000000000
+```
+
+Add
+
+```py
+>>> cipher_sum = num1 + num2
+>>> plain_sum = HE.decrypt(cipher_sum, decode_value=True)
+>>> print(f"Their sum is encrypted as ...{cipher_sum.to_bytes()[-16:].hex()}")
+>>> print(f"decrypted sum: {plain_sum}")
+Their sum is encrypted as ...6c79ba84188a38000000000000000000
+decrypted sum: 628
+```
+
+Substract
+
+```py
+>>> cipher_sub = num2 - num1
+>>> plain_sub = HE.decrypt(cipher_sub, decode_value=True)
+>>> print(f"Their difference is encrypted as ...{cipher_sub.to_bytes()[-16:].hex()}")
+>>> print(f"decrypted difference: {plain_sub}")
+Their difference is encrypted as ...74ac659d7c2e0e000000000000000000
+decrypted difference: 400
+```
+
+Mutiply
+
+```py
+>>> cipher_mul = num1 * num2
+>>> plain_mul = HE.decrypt(cipher_mul, decode_value=True)
+>>> print(f"Their product is encrypted as ...{cipher_mul.to_bytes()[-16:].hex()}")
+>>> print(f"decrypted product: {plain_mul}")
+Their product is encrypted as ...0010ecb42bb22e000000000000000000
+decrypted product: 58596
+```
+
+<!-- ```{literalinclude} fully-basic.py
 :language: python
 :linenos:
-```
+``` -->
 
 ````{important}
 The ciphertext length of an integer is 32828, encryted `114` and `514` share 28528 identical bytes.
