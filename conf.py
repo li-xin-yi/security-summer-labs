@@ -27,7 +27,7 @@ author = 'Xinyi Li'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['myst_parser','sphinx_panels','sphinx.ext.viewcode','sphinx_copybutton','sphinx.ext.linkcode']
+extensions = ['myst_parser','sphinx_panels','sphinx.ext.viewcode','sphinx_copybutton']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -53,10 +53,4 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 html_static_path = ['_static']
 myst_enable_extensions = ["linkify"]
 
-def linkcode_resolve(domain, info):
-    if domain != 'py':
-        return None
-    if not info['module']:
-        return None
-    filename = info['module'].replace('.', '/')
-    return "https://github.com/li-xin-yi/security-summer-labs/blob/main/lab4/%s.py" % filename
+myst_enable_extensions = ["dollarmath", "amsmath"]
