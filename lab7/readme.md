@@ -23,6 +23,13 @@ Install `adb` to send `.apk` files to the android VM
 $ sudo apt install adb
 ```
 
+Install [WireShark](https://www.wireshark.org/) to capture the traffic between two machines:
+
+```
+$ sudo add-apt-repository ppa:wireshark-dev/stable
+$ sudo apt-get install wireshark
+```
+
 `````
 
 `````{tabbed} Victim: Android
