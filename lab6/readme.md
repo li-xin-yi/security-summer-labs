@@ -1,20 +1,16 @@
 # Lab 6: Behavior-based Mobile Malware Analysis and Detection
 
+A collection of malware `apk`s: [android-malware](https://github.com/ashishb/android-malware/)
+ 
 ## Set-up
 
-Use the `reverse_tcp.apk` we constructed in [Lab 7](../lab7/readme.md), which is assumed to be located in home directory `~/`
+### Pre-analysis
 
-### Install [DroidFlow](https://github.com/secure-software-engineering/FlowDroid)
+Use the `reverse_tcp.apk` we constructed in [Lab 7](../lab7/readme.md).
 
-Download [`SourcesAndSinks.txt`](https://raw.githubusercontent.com/secure-software-engineering/FlowDroid/develop/soot-infoflow-android/SourcesAndSinks.txt) from DroidFlow project
+`````{tabbed} Pre-analysis
 
-Download `soot-infoflow-cmd-jar-with-dependencies.jar`
-
-```
-$ wget https://github.com/secure-software-engineering/FlowDroid/releases/download/v2.8/soot-infoflow-cmd-jar-with-dependencies.jar
-```
-
-### Find the SDK Version
+**Find the SDK Version**
 
 Install Android Command Line Tool
 
@@ -58,6 +54,36 @@ The default SDK root is `~/Android/Sdk` to install the target SDK for this app, 
 ```
 $./sdkmanager "platform-tools" "platforms;android-17"
 ```
+
+`````
+
+`````{tabbed} DroidFlow
+Download [`SourcesAndSinks.txt`](https://raw.githubusercontent.com/secure-software-engineering/FlowDroid/develop/soot-infoflow-android/SourcesAndSinks.txt) from DroidFlow project
+
+**Install [DroidFlow](https://github.com/secure-software-engineering/FlowDroid)**
+
+Download `soot-infoflow-cmd-jar-with-dependencies.jar`
+
+```
+$ wget https://github.com/secure-software-engineering/FlowDroid/releases/download/v2.8/soot-infoflow-cmd-jar-with-dependencies.jar
+```
+`````
+
+`````{tabbed} AndroPyTool/DroidBox
+
+Follow the [guide](https://alexmyg.github.io/AndroPyTool/):
+
+1. Install [Docker](https://docs.docker.com/engine/install/ubuntu/)
+2. Apply a [VirusTotal](https://www.virustotal.com/) API Key *(optional)*
+3. Pull the docker image:
+
+```
+$ docker pull alexmyg/andropytool
+```
+
+`````
+
+
 
 ## Static Analysis
 
@@ -142,4 +168,19 @@ It gives:
 [main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - - $r17 = virtualinvoke $r22.<java.net.URLConnection: java.io.InputStream getInputStream()>() in method <com.metasploit.stage.Payload: void main(java.lang.String[])>
 [main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - Data flow solver took 0 seconds. Maximum memory consumption: 115 MB
 [main] INFO soot.jimple.infoflow.android.SetupApplication - Found 1 leaks
+```
+
+## Dynamic Analysis
+
+Create a new directory `malware` to place the `reverse_tcp.apk`:
+
+```
+$ mkdir malware
+$ cp reverse_tcp.apk malware/
+```
+
+Start `andropytool` in a docker container, `/home/ubuntu/malware` is an example of the absolute path, `<api-key>` is the API key obtained from [VirusTotal](https://www.virustotal.com/):
+
+```
+$ sudo docker run --volume=/home/ubuntu/malware:/apks alexmyg/andropytool  -s /apks/ -vt <api-key> -all
 ```
