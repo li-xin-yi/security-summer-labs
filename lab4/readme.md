@@ -14,6 +14,12 @@ In general, a *fully* homomorphic encryption system supports both addition and m
 
 ## Set-up
 
+Install Python and `pip`
+
+```
+$ sudo apt install python3-dev
+```
+
 ````{tabbed} Python
 Create a virtual Python environment named `he-lab`
 
@@ -48,23 +54,6 @@ Check:
 
 ```
 $ pheutil --version
-```
-
-````
-
-
-````{tabbed} C++
-Install [HElib](https://homenc.github.io/HElib/) (v2.1.0)
-
-```
-$ wget https://github.com/homenc/HElib/archive/refs/tags/v2.1.0.tar.gz
-$ tar xzvf v2.1.0.tar.gz
-$ cd HElib-2.1.0
-$ mkdir build
-$ cd build
-$ cmake -DPACKAGE_BUILD=ON -DCMAKE_INSTALL_PREFIX=~/helib_install ..
-$ make
-$ make install
 ```
 
 ````

@@ -8,10 +8,12 @@ Set up two VMs, keep the attacker and victim machine within the same subnet.
 
 IP address: `10.0.2.15`
 
+
 Install [Metasploit](https://www.metasploit.com/) Module
 
 
 ```sh
+$ sudo apt install python3-dev
 $ curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall
 $ chmod 755 msfinstall
 $ ./msfinstall
@@ -33,7 +35,6 @@ $ sudo apt-get install wireshark
 `````
 
 `````{tabbed} Victim: Android
-
 IP address: `10.0.2.11`
 
 Run an Android virtual machine as [what seed project requests to do](https://seedsecuritylabs.org/Labs_16.04/Mobile/). After the VM installed, add some entries in `Contacts` app (e.g. Name: KMR, Phone: 114-514-1919)
@@ -47,6 +48,18 @@ $ ifconfig
 
 ````
 `````
+
+````{note}
+The two IP addresses listed above are just examples, you need to replace the values with the actual IP addresses on your virtual machines by
+
+```
+$ ifconfig
+```
+
+in the following tasks.
+
+Please make sure that the two VMs are configured with the same subnet.
+````
 
 
 ## Explore Metasploits 

@@ -14,6 +14,7 @@
 Download and install dependencies:
 
 ```
+$ sudo apt install cmake openssl curl
 $ git clone https://github.com/zeutro/openabe
 $ cd openabe
 $ sudo -E ./deps/install_pkgs.sh
