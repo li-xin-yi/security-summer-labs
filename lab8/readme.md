@@ -6,7 +6,7 @@ This lab is adapted from [SEED Labs – SQL Injection Attack Lab](https://seedse
 
 ## Set-up
 
-We adopt an android app named `SQL Inject Demo` ({download}`sql-inject-demo.apk`, source code availabel [li-xin-yi/sql_inject_demo](https://github.com/li-xin-yi/sql_inject_demo)) as our main environment, it should be installed on an android physical/virtual machine with API >= 17 (Android >= 4.2). We recommand a virtual machine of SDK API 25, which can be easily set-up either via [AVD manager integreated in Android Studio](https://developer.android.com/studio/run/emulator) or [SeedLab virtual machine on Virtual box](https://seedsecuritylabs.org/Labs_16.04/Mobile/SEEDAndroid_VirtualBox.pdf).
+We adopt an android app named `SQL Inject Demo` ({download}`sql-inject-demo.apk`, source code availabe [li-xin-yi/sql_inject_demo](https://github.com/li-xin-yi/sql_inject_demo)) as our main environment, it should be installed on an android physical/virtual machine with API >= 17 (Android >= 4.2). We recommand a virtual machine of SDK API 25, which can be easily set-up either via [AVD manager integreated in Android Studio](https://developer.android.com/studio/run/emulator) or [SeedLab virtual machine on Virtual box](https://seedsecuritylabs.org/Labs_16.04/Mobile/SEEDAndroid_VirtualBox.pdf).
 
 ## Task 0: Get familiar to the App
 
@@ -21,15 +21,13 @@ ID | Name | Password |  SSN | Salary | Nickname | Phone | Email | Address | Birt
 40000 | Samy | samy | 32111111 | 40000 | Sam | (450)218-8876 | samy@hogwarts.edu | Slytherin House | 2000-01-11 
 50000 | Ted | ted | 24343244 | 110000 | Teddy | (208)222-8712 | ted@hogwarts.edu | Azkaban | 2000-11-3
 
-Whenever you want to re-set the database as above, uninstall the app and re-install it.
+Whenever you want to re-set the database as above, uninstall the app and re-install it or tap on the RESET button.
 
-When you open it, you will first be asked to login in. Just pick one of the users (e.g. username: `Alice`, password `alice`)
+When you open it, you will first be asked to login in. Just pick one of the users (e.g. username: `Alice`, password `alice`). In general, if you type incorrect username or password, you cannot access the system:
 
 ![](./log-in-view.png)
 
-In general, if you type incorrect username or password, you cannot access the system:
 
-![](./incorrect-pwd.png)
 
 If you log in the system as a normal user (i.e. not Admin), you will enter your own profile page. Meanwhile, you can edit some fields (Nickname, Password, Address, Phone, and Email) and tap "Update" button to update your profile.
 
@@ -61,10 +59,12 @@ A typical login page takes user input as arguments of [where cluse](https://www.
 
 ```java
 public Employee findHandler(String username, String password) {
-    String query = "SELECT * FROM " + TABLE_NAME + " WHERE NAME='" + username + "' AND PASSWORD='" + password + "'";
+    String query;
+    Cursor cursor;
     SQLiteDatabase db = this.getReadableDatabase();
     Employee employee = null;
-    Cursor cursor = db.rawQuery(query, null);
+    query = "SELECT * FROM " + TABLE_NAME + " WHERE NAME='" + username + "' AND PASSWORD='" + password + "'";
+    cursor = db.rawQuery(query, null);
     if (cursor != null && cursor.getCount() > 0 && cursor.moveToFirst()) {
         employee = new Employee(Integer.parseInt(cursor.getString(0)),
                 cursor.getString(1),
@@ -187,4 +187,35 @@ WHERE NAME = 'Boby' -- ' WHERE ID = (Alice.id)
 
 It all works when we login with Admin to check:
 
-![](final.png)
+![](bob.png)
+
+## Mitigation
+
+From the tasks above, we see what damage a bad-designed query handler for SQL server can cause. Fortunately, an adversary is hard to see the code snippet of retrieving SQL query in a real-word application. However, it is still vulnerable to build query statement by simply joining all arguments like before, as she still can explore all possible injection code by enumerating. The best way to prevent her from injecting unsolicited SQL syntax into any query is to avoid using a completely constructed raw query in `rawQuery`. Instead, we can use a *parameterized statement*, such as SQLiteStatement, which offers both *binding* and *escaping* of arguments.
+
+For example, we can replace the code from line 6-7 in `findHandler` with
+
+```java
+query = "SELECT * FROM "+ TABLE_NAME + " WHERE NAME=? AND PASSWORD=?";
+cursor = db.rawQuery(query, new String[]{username,password});
+```
+
+and rewrite `partialUpdateHandler` method in a safe way as:
+
+```java
+public boolean safePartialUpdateHandler(Employee employee)
+{
+    SQLiteDatabase db = this.getWritableDatabase();
+    ContentValues values = new ContentValues();
+    values.put("PASSWORD", employee.getPassword());
+    values.put("NICKNAME", employee.getNickname());
+    values.put("PHONE", employee.getPhone());
+    values.put("ADDRESS", employee.getAddress());
+    values.put("EMAIL", employee.getEmail());
+    return -1!=db.update(TABLE_NAME,values,"ID=?", new String[]{String.valueOf(employee.getId())});
+}
+```
+
+The question mark `?` is a parameter holder in a SQL query, which is to be compiled with the according argument given in the String ListArray.
+
+We include the alternatives in the app, you just need to turn on the "Safe Mode" Switch when login, and repeat the tasks above, what will happen?
