@@ -114,7 +114,7 @@ In a CP-ABE (i.e. *role-based access control*) system , attributes are associate
 
 For instance, we have three users:
 
-Name | Age | Apartment 
+Name | Age | Department 
 ---------|----------|---------
 TDKR | 24 | Swimming club
 MUR | 21 | Karate club

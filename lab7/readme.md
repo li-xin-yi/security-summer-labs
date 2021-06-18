@@ -172,7 +172,7 @@ Launch `Wireshark` with root privilege:
 $ sudo wireshark
 ```
 
-When starting `exploit` in [Explore Metasploits](#explore-metasploits), `Wireshark` captures the TCP traffic between the attacker and the victim. For example, here is the packets that the reversed TCP connection establishes (Note that `10.0.2.15:4444` is the malicious host):
+When starting an `exploit` in [Explore Metasploits](#explore-metasploits), `Wireshark` captures the TCP traffic between the attacker and the victim. For example, here are the packets that the reversed TCP connection establishes (Note that `10.0.2.15:4444` is the malicious host):
 
 ![](./establish.png)
 

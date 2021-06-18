@@ -1,6 +1,6 @@
 # Lab 4: Processing encrypted data with Homomorphic Encryption (HE)
 
-**(Fully) Homomorphic Encryption (HE)** is a special class of encryption technique that allows for computations to be done on encrypted data, without requiring key to decrypt the ciphertext before operations and keep encrypted. It was first envisioned in 1978 [^rivest1978data] and constructed in 2009 [^gentry2009fully]. By applying HE to protect the customer's data on cloud, the cloud service can perform the computation directly on the given data with a state-of-the-art cryptographic security guarantee.
+**(Fully) Homomorphic Encryption (HE)** is a special class of encryption technique that allows for computations to be done on encrypted data, without requiring a key to decrypt the ciphertext before operations and keep it encrypted. It was first envisioned in 1978 [^rivest1978data] and constructed in 2009 [^gentry2009fully]. By applying HE to protect the customer's data on cloud, the cloud service can perform the computation directly on the given data with a state-of-the-art cryptographic security guarantee.
 
 ```{seealso}
 In general, a *fully* homomorphic encryption system supports both addition and multiplication operartions, while a *partially* homomorphic encryption may only enable one of them (e.g. [Paillier cryptosystem](https://en.wikipedia.org/wiki/Paillier_cryptosystem) is one implementation of partially homomorphic encryption that supports only addition operation [^paillier1999public]).
@@ -100,7 +100,7 @@ Their sum is encrypted as 41a992eaa94d6be9c4c3ab2bbcd911e840f3cbe3d1f2e66236864f
 decrypted sum: 628
 ```
 
-Substract ($De(En(a)-En(b))=a-b$):
+Subtract ($De(En(a)-En(b))=a-b$):
 
 ```py
 >>> cipher_sub = num2 - num1
@@ -228,7 +228,7 @@ Their sum is encrypted as ...6c79ba84188a38000000000000000000
 decrypted sum: 628
 ```
 
-Substract
+Subtract
 
 ```py
 >>> cipher_sub = num2 - num1
