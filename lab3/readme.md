@@ -14,7 +14,7 @@
 Download and install dependencies:
 
 ```
-$ sudo apt install cmake openssl curl
+$ sudo apt install python3-pip openssl
 $ git clone https://github.com/zeutro/openabe
 $ cd openabe
 $ sudo -E ./deps/install_pkgs.sh
@@ -38,6 +38,40 @@ Try
 
 And then start from the very beginning again.
 ```
+
+````{error}
+If you encounter the error during `make`:
+
+```
+libssh.so.4: undefined symbol: evp_pkey_get_raw_public_key, and version OPENSSL_1_1
+```
+and you can run `curl`,`openssl` normally in other shells (or after `make clean` in this shell)
+
+try
+
+```
+$ export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH
+```
+
+in which `/usr/lib/x86_64-linux-gnu/` is an example path of `libssl.so`
+
+````
+
+````{error}
+If you encounter the error during `make`:
+
+```
+../openabe/bin/bison: Command not found
+```
+
+Install `bison` and add the binary (suppose it in `/usr/bin`, you can find its location by `which bison`) to the folder
+
+```
+$ sudo apt install bison
+$ ln -s /usr/bin/bison /absolute-path-of-openabe/openabe/bin/bison
+```
+
+````
 
 Run unit tests
 
