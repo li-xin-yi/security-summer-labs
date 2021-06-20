@@ -6,7 +6,7 @@ This lab is adapted from [SEED Labs – SQL Injection Attack Lab](https://seedse
 
 ## Set-up
 
-We adopt an android app named `SQL Inject Demo` ({download}`sql-inject-demo.apk`, source code availabe [li-xin-yi/sql_inject_demo](https://github.com/li-xin-yi/sql_inject_demo)) as our main environment, it should be installed on an android physical/virtual machine with API >= 17 (Android >= 4.2). We recommand a virtual machine of SDK API 25, which can be easily set-up either via [AVD manager integreated in Android Studio](https://developer.android.com/studio/run/emulator) or [SeedLab virtual machine on Virtual box](https://seedsecuritylabs.org/Labs_16.04/Mobile/SEEDAndroid_VirtualBox.pdf).
+We adopt an android app named `SQL Inject Demo` ({download}`sql-inject-demo.apk`, source code available [li-xin-yi/sql_inject_demo](https://github.com/li-xin-yi/sql_inject_demo)) as our main environment, it should be installed on an android physical/virtual machine with API >= 17 (Android >= 4.2). We recommand a virtual machine of SDK API 25, which can be easily set-up either via [AVD manager integreated in Android Studio](https://developer.android.com/studio/run/emulator) or [SeedLab virtual machine on Virtual box](https://seedsecuritylabs.org/Labs_16.04/Mobile/SEEDAndroid_VirtualBox.pdf).
 
 ## Task 0: Get familiar to the App
 
@@ -19,11 +19,11 @@ ID | Name | Password |  SSN | Salary | Nickname | Phone | Email | Address | Birt
 20000 | Boby | boby | 10213352 | 50000 | Bob | (404)789-2313 | boby@hogwarts.edu | Hufflepuff House | 2000-04-20
 30000 | Ryan | ryan | 32193525 | 90000|  Ryanny | (210)096-3287 | ryan@hogwarts.edu | Ravenclaw House | 2000-04-10
 40000 | Samy | samy | 32111111 | 40000 | Sam | (450)218-8876 | samy@hogwarts.edu | Slytherin House | 2000-01-11 
-50000 | Ted | ted | 24343244 | 110000 | Teddy | (208)222-8712 | ted@hogwarts.edu | Azkaban | 2000-11-3
+50000 | Ted | ted | 24343244 | 110000 | Teddy | (208)222-8712 | ted@hogwarts.edu | Azkaban | 2000-11-03
 
 Whenever you want to re-set the database as above, uninstall the app and re-install it or tap on the RESET button.
 
-When you open it, you will first be asked to login in. Just pick one of the users (e.g. username: `Alice`, password `alice`). In general, if you type incorrect username or password, you cannot access the system:
+When you open it, you will first be asked to login in. Just pick one of the users (e.g. username: `Alice`, password `alice`). In general, if you type an incorrect username or password, you cannot access the system:
 
 ![](./log-in-view.png)
 
@@ -43,6 +43,10 @@ When tapping on any item in this page, you will jump to a profile page similar t
 
 ![](./root-profile.png)
 
+Moreover, you can delete the information of a certain employee and add a new employee by clicking on the "+" button on "All employees" view as well. Note that we might not use any functionalities of Admin add/delete/update in the following tasks, but by those data interface, you can explore the vulnerabilities with custom data in a more flexible way.
+
+![](./add-profile.png)
+
 Even if you exit from the app, all updated data will be stored in the database. Whenever you open the app again, the user data will look like what you last modified.
 
 
@@ -50,14 +54,18 @@ Even if you exit from the app, all updated data will be stored in the database. 
 ## Task 1: SQL Injection Attack on SELECT Statement
 
 ```{warning}
-Suppose that from now, we don't know the passowrd of any user.
+Suppose that from now, we don't know the password of any user.
 ```
 
 
-A typical login page takes user input as arguments of [where cluse](https://www.sqlitetutorial.net/sqlite-where/) to construct an SQL select query, if the database reponses the query with at least one valid result, the user can be authenticated. For example, the code snippet reveals how our app design for the authentication:
+A typical vulnerable login page takes user input as arguments of [where cluse](https://www.sqlitetutorial.net/sqlite-where/) to construct an SQL select query, if the database responses to the query with at least one valid result, the user can be authenticated. For example, the code snippet reveals how our app design for authentication:
 
 
-```java
+```{code-block} java
+---
+linenos:
+emphasize-lines: 6-7
+---
 public Employee findHandler(String username, String password) {
     String query;
     Cursor cursor;
@@ -90,7 +98,7 @@ As we have no knowledge about any password, we have to construct a payload to av
 " WHERE NAME='" + username + "' AND PASSWORD='" + password + "'"
 ```
 
-Assume we want to login as Admin account as it has more privileges
+Assume we want to login as an Admin account because it has more privileges
 
 `````{tabbed} Solution 1
 - username: `Admin' --`
@@ -102,10 +110,10 @@ It constructs the SQL query as:
 SELECT * FROM employee WHERE NAME='Admin' -- AND PASSWORD = 'xyz'
 ```
 
-`--` serves as a start symbol of a in-line comment, so `AND PASSWORD = 'xyz'` will be regarded as just comment and the validity of password will never be checked.
+`--` serves as a start symbol of an in-line comment, so `AND PASSWORD = 'xyz'` will be regarded as just comments and **the validity of password will never be checked**.
 
 ```{warning}
-The in-line command symbol `#` in MYSQL cannot be recongized in SQLite, a payload with `#` may lead the app to crush.
+The in-line command symbol `#` in MYSQL cannot be recongized in SQLite, a payload with `#` may lead the app to crash.
 ```
 `````
 
@@ -123,8 +131,16 @@ SELECT * FROM employee WHERE NAME='Admin' AND PASSWORD = 'anytext' OR '1'='1'
 
 ### Task 1.1: Append a new SQL statement
 
+We may not be satisfied with only bypassing authentication and stealing information. It will be better if we can append a new SQL statement right after the supposed SQL query to modify the database. 
+
+Usually, a semicolon (`;`) is used to separate two SQL statements. So what if we append a INSERT statement when login the system? For example,
+
 - username: `a' OR 1=1; INSERT INTO employee (NAME, ID) VALUES ('MUR','11451') --`
 - password: `anything`
+
+Unfortunately, although we can pass the login page by the injection code, no new data will be inserted into the database. Because `;` is defined as a termination in most [SQLiteDatabase API](https://developer.android.com/reference/android/database/sqlite/SQLiteDatabase.html#execSQL(java.lang.String)), anything after it should be ignored, which means it does not support multiple statements in single query. [^1]
+
+[^1]: More information can be referenced [in this question](https://stackoverflow.com/questions/13202600/android-and-sqlite-when-to-use-semicolons-to-end-statements)
 
 ## Task 2: SQL Injection Attack on UPDATE Statement
 
@@ -191,7 +207,7 @@ It all works when we login with Admin to check:
 
 ## Mitigation
 
-From the tasks above, we see what damage a bad-designed query handler for SQL server can cause. Fortunately, an adversary is hard to see the code snippet of retrieving SQL query in a real-word application. However, it is still vulnerable to build query statement by simply joining all arguments like before, as she still can explore all possible injection code by enumerating. The best way to prevent her from injecting unsolicited SQL syntax into any query is to avoid using a completely constructed raw query in `rawQuery`. Instead, we can use a *parameterized statement*, such as SQLiteStatement, which offers both *binding* and *escaping* of arguments.
+From the tasks above, we see what damage a bad-designed query handler for SQL server can cause. Fortunately, an adversary is hard to see the code snippet of retrieving SQL query in a real-word application. However, it is still vulnerable to build query statements by simply joining all arguments like before, as she still can explore all possible injection code by empirically enumerating them out. The best way to prevent her from injecting unsolicited SQL syntax into any query is to avoid using a completely constructed raw query in `rawQuery`. Instead, we can use a *parameterized/prepared statement*, such as SQLiteStatement, which offers both *binding* and *escaping* of arguments.
 
 For example, we can replace the code from line 6-7 in `findHandler` with
 
@@ -216,6 +232,10 @@ public boolean safePartialUpdateHandler(Employee employee)
 }
 ```
 
-The question mark `?` is a parameter holder in a SQL query, which is to be compiled with the according argument given in the String ListArray.
+The question mark `?` is a parameter holder in a SQL query, which is to be compiled with the according argument given in the String ListArray. Both safe and unsafe version of SQL operation are listed in source code ([`DBHandler.java`](https://github.com/li-xin-yi/SQL-inject-demo/blob/main/app/src/main/java/com/example/sql_inject_demo/DBHandler.java)).
 
-We include the alternatives in the app, you just need to turn on the "Safe Mode" Switch when login, and repeat the tasks above, what will happen?
+We include the alternatives in the app, you just need to turn on the "Safe Mode" switch when login, and repeat the tasks above, what will happen?
+
+More categories of attacks and defenses [^2] are left for student interested in to read and test on this app.
+
+[^2]: Alwan, Zainab S., and Manal F. Younis. "[Detection and prevention of sql injection attack: A survey.](https://www.researchgate.net/profile/Zainab-Alwan-5/publication/320108029_Detection_and_Prevention_of_SQL_Injection_Attack_A_Survey/links/59ce63840f7e9b4fd7e1b495/Detection-and-Prevention-of-SQL-Injection-Attack-A-Survey.pdf)" *International Journal of Computer Science and Mobile Computing* 6, no. 8 (2017): 5-17.
