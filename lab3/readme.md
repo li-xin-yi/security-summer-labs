@@ -231,3 +231,50 @@ $oabe_dec -s CP -p DA -k harry_key.key -i invitation.cpabe -o harry_invitation.t
 ```
 
 Only Harry, Ron and Hermione can view the invitation information.
+
+
+## KP-ABE Exercises
+
+Let's take an exercise with the scenarios of "*The Avengers*" to practice the KP-ABE. *The Avengers* is an organization found by S.H.I.E.L.D Director Nick Fury in May 4, 2012, all members in the team are gifted superheroes that are committed to the world's protection from a variety of threats. Superheros are assigned with different missions and often communicate with encrypted messages that can only be decrypted by certain receivers who are temperarily **out of** the organization HQ, which means **their secret key can only decrypt messages to themselves sent on the dates when they are not in the Avengers Tower**, which prevents the serect message from stealing by Hydra. Iron Man is the intial member who joined the Avengers when it was founded. However, he disagreed with Captain America on the *Sokovia Accords* and determinedly left the Avengers in April 6, 2016. After a month, He discovered the misunderstood truth and accepted apology from Captain America, so he returned the group.
+
+Now, Iron Man find four encrypted notes accidentally in Avengers Tower, their meta data are listed as below:
+
+1. This message was sent from Thor to Hulk, dated in May 10, 2012
+2. This message was sent from Black Widow to Iron Man, dated in April 22, 2016
+3. This message was sent from Hawkeye to Captain America, dated in May 3, 2016
+4. This message was sent from Captain America to Iron Man, dated in Sep 20, 2017
+
+Construct Iron Man's secret key:
+
+```
+$ oabe_setup -s KP -p avengers
+$ oabe_keygen -s KP -p avengers -i "(To:Iron_Man and (Date = April 6-30,2016 or Date = May 1-5,2016))" -o iron_man_key
+```
+
+Construct the ciphertexts of the four messages:
+
+```
+$ echo "note1" > note1.txt
+$ echo "note2" > note2.txt
+$ echo "note3" > note3.txt
+$ echo "note4" > note4.txt
+$ oabe_enc -s KP -p avengers -e "From:Thor|To:Hulk|Date = May 10, 2012" \
+          -i note1.txt -o note1.kpabe
+$ oabe_enc -s KP -p avengers -e "From:Black_Widow|To:Iron_Man|Date = April 22,2016" \
+          -i note2.txt -o note2.kpabe
+$ oabe_enc -s KP -p avengers -e "From:Hawkeye|To:Captain_America|Date = May 3, 2016" \
+          -i note3.txt -o note3.kpabe
+$ oabe_enc -s KP -p avengers -e "From:Captain_America|To:Iron_Man|Date = Sep 20, 2017" \
+          -i note4.txt -o note4.kpabe
+```
+
+Verify which encrypted notes can be decrypted by Iron Man:
+
+```
+$ oabe_dec -s KP -p avengers -k iron_man_key.key -i note1.kpabe -o iron_man_note1.txt
+$ oabe_dec -s KP -p avengers -k iron_man_key.key -i note2.kpabe -o iron_man_note2.txt
+$ oabe_dec -s KP -p avengers -k iron_man_key.key -i note3.kpabe -o iron_man_note3.txt
+$ oabe_dec -s KP -p avengers -k iron_man_key.key -i note4.kpabe -o iron_man_note4.txt
+```
+
+Only the second message can be decrypted.
