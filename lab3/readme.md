@@ -186,3 +186,48 @@ $ oabe_dec -s KP -p COAT -k TDKR_KP.key -i input2.kpabe -o input2_plain.txt
 # decrypt the second email -- should fail (receiver mismatches)
 $ oabe_dec -s KP -p COAT -k TDKR_KP.key -i input3.kpabe -o input3_plain.txt
 ```
+
+## CP-ABE Exercises
+
+Let's use the scenarios of "*Harry Potter and the Order of the Phoenix*" to practice the CP-ABE. As Umbridge's control over Hogwarts campus increases, Ron and Hermione aid Harry in forming a secret group, "*Dumbledore's Army*(DA)", to train students in defensive spells. Some students joining in DA are listed as below:
+
+
+Character | House| Year | Gender
+-----|----|----|---
+Harry | Gryffindor | 5th | Male
+Ron | Gryffindor | 5th | Male
+Hermione | 	Gryffindor | 5th | Female
+Cho | Ravenclaw | 6th | Female
+Luna | Ravenclaw | 5th | Female
+Ginny | Gryffindor | 4th | Female
+
+One day, Hermione is going to hold a meeting about teaching *Expecto Patronum*, which is a very hard spelling and can only be mastered by senior (>= fifth year) students, in Gryffindor common room. It indicates that she has to encrypt a magic message sent by a shared owl Errol in DA group, which means the message may be delivered any DA member or even anyone in Hogwarts. However, she wants the message to be only viewable to senior students in Gryffindor House.
+
+First, we should create a CP-ABE crypto-sytem called "DA"
+
+```
+$ oabe_setup -s CP -p DA
+$ oabe_keygen -s CP -p DA -i "Gryffindor|Year=5|Male" -o harry_key
+$ oabe_keygen -s CP -p DA -i "Gryffindor|Year=5|Male" -o ron_key
+$ oabe_keygen -s CP -p DA -i "Gryffindor|Year=5|Female" -o hermione_key
+$ oabe_keygen -s CP -p DA -i "Ravenclaw|Year=6|Female" -o cho_key
+$ oabe_keygen -s CP -p DA -i "Ravenclaw|Year=5|Female" -o luna_key
+$ oabe_keygen -s CP -p DA -i "Gryffindor|Year=4|Female" -o ginny_key
+```
+
+Then, Herminoe writes the massage and encrypted with public key.
+
+```
+$ echo "Go to meet in Gryffindor common room at 7 p.m., Let's talk about how to teach Expecto Patronum" > invitation.txt
+
+$ oabe_enc -s CP -p DA -e "((Year>=5) and (Gryffindor))" -i invitation.txt -o invitation.cpabe
+```
+
+Verify who can decrypt the invitation message:
+
+```
+$oabe_dec -s CP -p DA -k harry_key.key -i invitation.cpabe -o harry_invitation.txt
+...
+```
+
+Only Harry, Ron and Hermione can view the invitation information.
