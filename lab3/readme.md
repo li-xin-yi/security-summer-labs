@@ -189,7 +189,7 @@ $ oabe_dec -s KP -p COAT -k TDKR_KP.key -i input3.kpabe -o input3_plain.txt
 
 ## CP-ABE Exercises
 
-Let's use the scenarios of "*Harry Potter and the Order of the Phoenix*" to practice the CP-ABE. As Umbridge's control over Hogwarts campus increases, Ron and Hermione aid Harry in forming a secret group, "*Dumbledore's Army*(DA)", to train students in defensive spells. Some students joining in DA are listed as below:
+Let's use the scenarios of "*Harry Potter and the Order of the Phoenix*" to pratice CP-ABE. As Umbridge's control over Hogwarts campus increases, Ron and Hermione aid Harry in forming a secret group, "*Dumbledore's Army*(DA)", to train students in defensive spells. Some students joining in the DA are listed as below:
 
 
 Character | House| Year | Gender
@@ -201,9 +201,9 @@ Cho | Ravenclaw | 6th | Female
 Luna | Ravenclaw | 5th | Female
 Ginny | Gryffindor | 4th | Female
 
-One day, Hermione is going to hold a meeting about teaching *Expecto Patronum*, which is a very hard spelling and can only be mastered by senior (>= fifth year) students, in Gryffindor common room. It indicates that she has to encrypt a magic message sent by a shared owl Errol in DA group, which means the message may be delivered any DA member or even anyone in Hogwarts. However, she wants the message to be only viewable to senior students in Gryffindor House.
+One day, Hermione is going to hold a meeting about teaching *Expecto Patronum*, which is a very hard spelling and can only be mastered by senior (>= fifth year) students, in the Gryffindor common room. She has to encrypt a magic message sent by a shared owl, Errol. in DA, which means the message may be delivered to any DA member or even anyone in Hogwarts. However, she wants the message to be only viewable to senior students in Gryffindor House.
 
-First, we should create a CP-ABE crypto-sytem called "DA"
+First, we should create a CP-ABE crypto-system called "DA"
 
 ```
 $ oabe_setup -s CP -p DA
@@ -215,7 +215,7 @@ $ oabe_keygen -s CP -p DA -i "Ravenclaw|Year=5|Female" -o luna_key
 $ oabe_keygen -s CP -p DA -i "Gryffindor|Year=4|Female" -o ginny_key
 ```
 
-Then, Herminoe writes the massage and encrypted with public key.
+Then, Hermione writes the massage and encrypted it with public key.
 
 ```
 $ echo "Go to meet in Gryffindor common room at 7 p.m., Let's talk about how to teach Expecto Patronum" > invitation.txt
@@ -223,7 +223,7 @@ $ echo "Go to meet in Gryffindor common room at 7 p.m., Let's talk about how to 
 $ oabe_enc -s CP -p DA -e "((Year>=5) and (Gryffindor))" -i invitation.txt -o invitation.cpabe
 ```
 
-Verify who can decrypt the invitation message:
+Finally, we verify who can decrypt the invitation message:
 
 ```
 $oabe_dec -s CP -p DA -k harry_key.key -i invitation.cpabe -o harry_invitation.txt
@@ -235,14 +235,14 @@ Only Harry, Ron and Hermione can view the invitation information.
 
 ## KP-ABE Exercises
 
-Let's take an exercise with the scenarios of "*The Avengers*" to practice the KP-ABE. *The Avengers* is an organization found by S.H.I.E.L.D Director Nick Fury in May 4, 2012, all members in the team are gifted superheroes that are committed to the world's protection from a variety of threats. Superheros are assigned with different missions and often communicate with encrypted messages that can only be decrypted by certain receivers who are temperarily **out of** the organization HQ, which means **their secret key can only decrypt messages to themselves sent on the dates when they are not in the Avengers Tower**, which prevents the serect message from stealing by Hydra. Iron Man is the intial member who joined the Avengers when it was founded. However, he disagreed with Captain America on the *Sokovia Accords* and determinedly left the Avengers in April 6, 2016. After a month, He discovered the misunderstood truth and accepted apology from Captain America, so he returned the group.
+Let's take an exercise from the scenes of "*The Avengers*" to practice KP-ABE. *The Avengers* is an organization founded by S.H.I.E.L.D Director Nick Fury on May 4, 2012, all members in the team are gifted superheroes that are committed to protect the world from a variety of threats. Superheros are assigned with different missions and often communicate with encrypted messages that can only be decrypted by certain receivers who are temporarily **out of** the organization HQ, which means **their secret key can only decrypt messages to themselves sent on the dates when they are not in the Avengers Tower** and prevents the secret message from being stolen by Hydra. Iron Man is the first member who joined the Avengers when it was founded. However, he disagreed with Captain America on the *Sokovia Accords* and determinedly left the Avengers on April 6, 2016. After a month, He discovered the misunderstood truth and accepted an apology from Captain America, so he returned to the group.
 
-Now, Iron Man find four encrypted notes accidentally in Avengers Tower, their meta data are listed as below:
+Now, Iron Man accidentally finds four encrypted notes in Avengers Tower, their metadata is listed below:
 
-1. This message was sent from Thor to Hulk, dated in May 10, 2012
-2. This message was sent from Black Widow to Iron Man, dated in April 22, 2016
-3. This message was sent from Hawkeye to Captain America, dated in May 3, 2016
-4. This message was sent from Captain America to Iron Man, dated in Sep 20, 2017
+1. This message was sent from Thor to Hulk, dated on May 10, 2012
+2. This message was sent from Black Widow to Iron Man, dated on April 22, 2016
+3. This message was sent from Hawkeye to Captain America, dated on May 3, 2016
+4. This message was sent from Captain America to Iron Man, dated on Sep 20, 2017
 
 Construct Iron Man's secret key:
 
