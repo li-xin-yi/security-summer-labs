@@ -14,12 +14,12 @@ This app uses an SQLite database to simulate an employee manage system. After in
 
 ID | Name | Password |  SSN | Salary | Nickname | Phone | Email | Address | Birthday
 ---|---|---|---|---|---|---|---|---|---|
-99999 | Admin | admin | 43254314 | 400000 | Ad | (403)220-1191 | admin@hogwarts.edu | Gryffindor House | 1990-03-05
-10000 | Alice | alice | 10211002 | 20000 | Ali | (400)210-2112 | alice@hogwarts.edu | Gryffindor House | 2000-09-20
-20000 | Boby | boby | 10213352 | 50000 | Bob | (404)789-2313 | boby@hogwarts.edu | Hufflepuff House | 2000-04-20
-30000 | Ryan | ryan | 32193525 | 90000|  Ryanny | (210)096-3287 | ryan@hogwarts.edu | Ravenclaw House | 2000-04-10
-40000 | Samy | samy | 32111111 | 40000 | Sam | (450)218-8876 | samy@hogwarts.edu | Slytherin House | 2000-01-11 
-50000 | Ted | ted | 24343244 | 110000 | Teddy | (208)222-8712 | ted@hogwarts.edu | Azkaban | 2000-11-03
+99999 | Admin | admin | 43254314 | 400000 | Admin | (403) 220-1191 | admin@hogwarts.edu | Gryffindor House | 1990-03-05
+10000 | Alice | alice | 10211002 | 20000 | Alice | (400)210-2112 | alice@hogwarts.edu | Gryffindor House | 2000-09-20
+20000 | Bobby | bobby | 10213352 | 50000 | Bob | (404) 789-2313 | boby@hogwarts.edu | Hufflepuff House | 2000-04-20
+30000 | Ryan | ryan | 32193525 | 90000|  Ryanny | (210) 096-3287 | ryan@hogwarts.edu | Ravenclaw House | 2000-04-10
+40000 | Sammy | sammy | 32111111 | 40000 | Sam | (450) 218-8876 | samy@hogwarts.edu | Slytherin House | 2000-01-11 
+50000 | Ted | ted | 24343244 | 110000 | Teddy | (208) 222-8712 | ted@hogwarts.edu | Azkaban | 2000-11-03
 
 Whenever you want to re-set the database as above, uninstall the app and re-install it or tap on the RESET button.
 
