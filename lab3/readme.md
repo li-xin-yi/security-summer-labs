@@ -189,7 +189,7 @@ $ oabe_dec -s KP -p COAT -k TDKR_KP.key -i input3.kpabe -o input3_plain.txt
 
 ## CP-ABE Exercises
 
-Let's use the scenarios of "*Harry Potter and the Order of the Phoenix*" to pratice CP-ABE. As Umbridge's control over Hogwarts campus increases, Ron and Hermione aid Harry in forming a secret group, "*Dumbledore's Army*(DA)", to train students in defensive spells. Some students joining in the DA are listed as below:
+Let's use the scenarios of "*Harry Potter and the Order of the Phoenix*" to practice CP-ABE. As Umbridge's control over Hogwarts campus increases, Ron and Hermione aid Harry in forming a secret group, "*Dumbledore's Army*(DA)", to train students in defensive spells. Some students joining in the DA are listed as below:
 
 
 Character | House| Year | Gender
@@ -215,7 +215,7 @@ $ oabe_keygen -s CP -p DA -i "Ravenclaw|Year=5|Female" -o luna_key
 $ oabe_keygen -s CP -p DA -i "Gryffindor|Year=4|Female" -o ginny_key
 ```
 
-Then, Hermione writes the massage and encrypted it with public key.
+Then, Hermione writes the massage and encrypted it with a public key.
 
 ```
 $ echo "Go to meet in Gryffindor common room at 7 p.m., Let's talk about how to teach Expecto Patronum" > invitation.txt
