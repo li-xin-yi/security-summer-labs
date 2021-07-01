@@ -32,7 +32,7 @@ It uses `sh` as default commond-line tool, you can switch to `bash` by running `
 
 By selecting a running container, you can monitor the performance stats:
 
-![](figs/stat)
+![](figs/stat.png)
 `````
 
 `````{tabbed} Ubuntu
@@ -121,3 +121,34 @@ in which `-it` (`--interactive + --tty`) takes you directly inside of the contai
 
 `````
 
+## Common Docker Commands
+
+List all running containers:
+
+```
+$ docker ps
+```
+
+List all containers (including exited ones):
+
+```
+$ docker ps -a
+```
+
+Remove all exited docker containers:
+
+```
+$ docker rm $(docker ps -qa --no-trunc --filter "status=exited")
+```
+
+List all local images
+
+```
+$ docker images
+```
+
+Remove all local images:
+
+```
+$ docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
+```
