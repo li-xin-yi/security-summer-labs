@@ -135,6 +135,12 @@ List all containers (including exited ones):
 $ docker ps -a
 ```
 
+Kill all running containers:
+
+```
+$ docker container kill $(docker ps -q) 
+```
+
 Remove all exited docker containers:
 
 ```
@@ -150,5 +156,5 @@ $ docker images
 Remove all local images:
 
 ```
-$ docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
+$ docker rmi $(docker images -a -q)
 ```
