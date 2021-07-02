@@ -164,7 +164,7 @@ $ docker rmi $(docker images -a -q)
 ### Lab 3
 
 - Dockerfile: {Download}`lab3/Dockerfile`
-- Remote: https://hub.docker.com/repository/docker/yangzhou301/lab3
+- Remote: [yangzhou301/lab3](https://hub.docker.com/repository/docker/yangzhou301/lab3)
 - Command:
 
 ```
@@ -173,7 +173,7 @@ $ docker run -it yangzhou301/lab3
 
 ### Lab 7
 
-In this lab, we need to run 2 machine (victim and attack).
+In this lab, we need to run 2 machines (victim and attack).
 
 
 ```
