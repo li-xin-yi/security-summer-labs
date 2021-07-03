@@ -17,12 +17,27 @@ services:
     
     Attack:
         image: yangzhou301/lab7
-        container_name: attack
+        container_name: attacker
         build: .
         tty: true
         networks:
             net-10.9.0.0:
                 ipv4_address: 10.9.0.7
+    
+    Analysis:
+        image: linuxserver/wireshark
+        container_name: analyzer
+        privileged: true
+        cap_add:
+            - NET_ADMIN
+        environment: 
+            - PUID=1000
+            - PGID=1000
+        ports:
+            - "3000:3000"
+        networks:
+            net-10.9.0.0:
+                ipv4_address: 10.9.0.8
 
 networks:
     net-10.9.0.0:

