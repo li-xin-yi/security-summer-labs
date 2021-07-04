@@ -1,0 +1,15 @@
+version: "3"
+
+services: 
+    mobile:
+        image: yangzhou301/lab8
+        build: .
+        container_name: mobile
+        privileged: true
+        restart: on-failure
+        ports: 
+            - "6080:6080"
+            - "5554:5554"
+            - "5555:5555"
+        environment:
+            - DEVICE=Samsung Galaxy S10

