@@ -20,14 +20,6 @@ services:
         container_name: attacker
         build: .
         tty: true
-        networks:
-            net-10.9.0.0:
-                ipv4_address: 10.9.0.7
-    
-    Analysis:
-        image: linuxserver/wireshark
-        container_name: analyzer
-        privileged: true
         cap_add:
             - NET_ADMIN
         environment: 
@@ -37,7 +29,8 @@ services:
             - "3000:3000"
         networks:
             net-10.9.0.0:
-                ipv4_address: 10.9.0.8
+                ipv4_address: 10.9.0.7
+
 
 networks:
     net-10.9.0.0:
