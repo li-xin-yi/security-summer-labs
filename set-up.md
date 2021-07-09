@@ -25,7 +25,7 @@ After the container starts running, you can click the CLI buttom to open a comma
 ![](figs/container.png)
 
 ```{note}
-It uses `sh` as default commond-line tool, you can switch to `bash` by running `\bin\bash` right after opening the CLI.
+It uses `sh` as default commond-line tool, you can switch to `bash` by running `/bin/bash` right after opening the CLI.
 
 ![](figs/cli.png)
 ```
