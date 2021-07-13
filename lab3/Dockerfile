@@ -3,7 +3,7 @@ FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND noninteractive
 
 SHELL ["/bin/bash", "-c"]
-RUN apt-get update && apt-get install -y git apt-utils python3-pip openssl lsb-release cmake wget bison sudo 
+RUN apt-get update && apt-get install -y git apt-utils python3-pip openssl lsb-release cmake wget bison sudo
 RUN sudo apt install ca-certificates
 RUN printf "\nca_directory=/etc/ssl/certs/" | sudo tee -a /etc/wgetrc
 RUN git clone https://github.com/zeutro/openabe

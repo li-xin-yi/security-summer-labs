@@ -1,0 +1,44 @@
+version: "3"
+
+services: 
+    lab-linux:
+        image: yangzhou301/lab-linux
+        build: .
+        container_name: lab-linux
+        tty: true
+        cap_add:
+            - NET_ADMIN
+        environment: 
+            - PUID=1000
+            - PGID=1000
+        ports:
+            - "3000:3000"
+        volumes:
+            - ~/volumes:/volumes
+        networks:
+            net-10.9.0.0:
+                ipv4_address: 10.9.0.10
+        restart: unless-stopped
+
+    lab-android:
+        image: yangzhou301/lab-android
+        build: lab8/
+        container_name: lab-android
+        privileged: true
+        restart: on-failure
+        ports: 
+            - "6080:6080"
+            - "5554:5554"
+            - "5555:5555"
+        environment:
+            - DEVICE=Samsung Galaxy S9
+        networks:
+            net-10.9.0.0:
+                ipv4_address: 10.9.0.9
+
+networks:
+    net-10.9.0.0:
+        name: net-10.9.0.0
+        ipam:
+            config: 
+                - subnet: 10.9.0.0/24

@@ -1,6 +1,16 @@
 # Set-up
 
-I'm trying to encapsulate all lab environments into Docker containers respectively. So users can access the environments directly without installing extra dependencies (skip Set-up section in each lab). The only thing you need to prepare is to install Docker on your (cloud) machine.
+For convience, all lab environments are encapsulated into [Docker containers](https://www.docker.com/) respectively. So users can access the environments directly without installing extra dependencies (i.e. you can skip Set-up section in each lab). The only thing you need to prepare is to install Docker on your (cloud) machine.
+
+````{warning}
+The Android emulator container (used in Lab 7 and Lab 8) can not run on a machine that does not support KVM. So Lab 7 and 8 should not be finished on most cloud servers (see [README_CLOUD.md](https://github.com/budtmo/docker-android/blob/master/README_CLOUD.md) to check if your cloud server can host the container) or Windows/MacOS platform directly (but you may run the container on a Linux VM). To check if your Linux machine supports KVM, run:
+
+```
+$ sudo apt install cpu-checker
+$ kvm-ok
+```
+
+````
 
 ## Install Docker
 
@@ -190,6 +200,66 @@ Open a shell on a running container named `container-name`
 $ docker exec -it container-name /bin/bash
 ```
 
+## All in One
+
+We also integrated all dependencies of all labs into two container images:
+- `lab-linux`: {Download}`Dockerfile`
+- `lab-android`: {Download}`lab8/Dockerfile`
+
+And they are managed in a docker-compose file (`lab-linux`: {Download}`docker-compose.yml`). To use either of them you can run
+
+```sh
+# for lab 3,4,6
+$ docker-compose up lab-linux -d
+```
+
+or 
+
+```sh
+# for lab 8
+$ docker-compose up lab-android -d
+```
+
+or run them together (for lab 7)
+
+```sh
+$ docker-compose up lab-linux lab-android -d
+```
+
+If it succeeds, you can also see a Wireshark GUI on http://localhost:3000/ for `lab-linux`
+
+![](fig/wireshark-web.png)
+
+and an Android Emulator GUI on http://localhost:6080/ 
+
+Almost all labs are supposed to start in `lab-linux` container by starting a `bash` in it via:
+
+```
+$ docker exec -it lab-linux /bin/bash
+```
+
+in which the work directory is `/volumnes`, a shared folder with `~/volumes` on your host, you can replace `~/volumes` in `docker-compose.yml` with the path that you specify as the shared folder. It is the easiest way to share files between the host and the container.
+
+Except for Lab 8, in which should install an `.apk` by:
+
+```
+$ docker exec -it lab-android  bash -c "adb install lab8/sql-inject-demo.apk"
+```
+
+And then manipulate the app all the time on http://localhost:6080/
+
+After all works done, don't forget to run
+
+```
+$ docker-compose down
+```
+
+to shut them down. Once you confirm that no tasks left, you can release the space by removing exited containers and images:
+
+```
+$ docker rm $(docker ps -qa --no-trunc --filter "status=exited")
+$ docker rmi $(docker images -a -q)
+```
 
 ## For Each Lab
 
@@ -269,7 +339,7 @@ If you have other `apk`s to analyze, put them into the shared directory `~/lab6-
 
 Then you can view the reports in this directory locally.
 
-After all jobs done, remove the container:
+After all jobs are done, remove the container:
 
 ```
 $ docker rm $(docker ps -qa --no-trunc --filter "status=exited")
@@ -304,7 +374,7 @@ $ docker-compose up -d -f docker-compose.yml
 ```
 $ docker exec -it attacker /bin/bash
 ```
- - After all jobs done, terminate all containers by
+ - After all jobs are done, terminate all containers by
 
 ```
 $ docker-compose down
@@ -333,12 +403,10 @@ $ docker-compose up -d -f docker-compose.yml
   - Install `sql-inject-demo.apk` on it:
 
 ```
-$ docker exec -it mobile /bin/bash
-# adb install lab8/sql-inject-demo.apk
-# exit
+$ docker exec -it mobile bash -c "adb install lab8/sql-inject-demo.apk"
 ```
 
-  - After all jobs done, terminate all containers by
+  - After all jobs are done, terminate all containers by
 
 ```
 $ docker-compose down
