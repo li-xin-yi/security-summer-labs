@@ -1,4 +1,4 @@
-# Set-up
+# Set-up (Docker Container)
 
 For convience, all lab environments are encapsulated into [Docker containers](https://www.docker.com/) respectively. So users can access the environments directly without installing extra dependencies (i.e. you can skip Set-up section in each lab). The only thing you need to prepare is to install Docker on your (cloud) machine.
 
@@ -206,7 +206,7 @@ We also integrated all dependencies of all labs into two container images:
 - `lab-linux`: {Download}`Dockerfile`
 - `lab-android`: {Download}`lab8/Dockerfile`
 
-And they are managed in a docker-compose file (`lab-linux`: {Download}`docker-compose.yml`). To use either of them you can run
+And they are managed in a docker-compose file ({Download}`docker-compose.yml`). To use either of them you can download `docker-compose.yml` and start commonds within the same directory
 
 ```sh
 # for lab 3,4,6
@@ -223,16 +223,16 @@ $ docker-compose up lab-android -d
 or run them together (for lab 7)
 
 ```sh
-$ docker-compose up lab-linux lab-android -d
+$ docker-compose up -d
 ```
 
-If it succeeds, you can also see a Wireshark GUI on http://localhost:3000/ for `lab-linux`
+If it succeeds, you can also see a Wireshark GUI on [http://localhost:3000/](http://localhost:3000/) for `lab-linux`
 
 ![](figs/wireshark-web.png)
 
-and an Android Emulator GUI on http://localhost:6080/
+and an Android Emulator GUI on [http://localhost:6080/](http://localhost:6080/)
 
-![](figs/android-web.pngv)
+![](figs/android-web.png)
 
 Almost all labs are supposed to start in `lab-linux` container by starting a `bash` in it via:
 
@@ -240,19 +240,19 @@ Almost all labs are supposed to start in `lab-linux` container by starting a `ba
 $ docker exec -it lab-linux /bin/bash
 ```
 
-in which the work directory is `/volumnes`, a shared folder with `~/volumes` on your host, you can replace `~/volumes` in `docker-compose.yml` with the path that you specify as the shared folder. It is the easiest way to share files between the host and the container.
+on which the work directory is `/volumnes`, a shared folder with `~/volumes` on your host, you can replace `~/volumes` in `docker-compose.yml` with the path that you specify as the shared folder. It is the easiest way to share files between the host and the container.
 
 ````{note}
-There are two version of Python on `lab-linux`: Python 3.6 is used in Lab 4 and must be specified as `python3` in commands, Python 2.7 is used in Lab 6 to run `AndroPyTool` and should be specified as `python`
+There are two versions of Python on `lab-linux`: Python 3.6 is used in Lab 4 and must be specified as `python3` in commands, Python 2.7 is used in Lab 6 to run `AndroPyTool` and should be specified as `python`.
 ````
 
-Except for Lab 8, in which should install an `.apk` by:
+Except for Lab 8, on which should install an `.apk` by:
 
 ```
 $ docker exec -it lab-android  bash -c "adb install lab8/sql-inject-demo.apk"
 ```
 
-And then manipulate the app all the time on http://localhost:6080/
+And then manipulate the app all the time on [http://localhost:6080/](http://localhost:6080/)
 
 After all works done, don't forget to run
 

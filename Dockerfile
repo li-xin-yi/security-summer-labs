@@ -32,7 +32,7 @@ RUN sudo -E make install
 
 ENV LD_LIBRARY_PATH="/usr/local/lib:${LD_LIBRARY_PATH}"
 
-RUN sudo apt-get remove -y ca-certificates && sudo apt-get autoremove
+RUN sudo apt-get remove -y ca-certificates && sudo apt-get autoremove -y
 
 # lab 7
 
