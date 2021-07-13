@@ -12,6 +12,7 @@ RUN pip3 install --user phe[cli] Pyfhel
 
 # lab 3
 RUN sudo apt-get install ca-certificates
+RUN sudo cp /etc/wgetrc /
 RUN printf "\nca_directory=/etc/ssl/certs/" | sudo tee -a /etc/wgetrc
 
 WORKDIR /

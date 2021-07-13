@@ -228,9 +228,11 @@ $ docker-compose up lab-linux lab-android -d
 
 If it succeeds, you can also see a Wireshark GUI on http://localhost:3000/ for `lab-linux`
 
-![](fig/wireshark-web.png)
+![](figs/wireshark-web.png)
 
-and an Android Emulator GUI on http://localhost:6080/ 
+and an Android Emulator GUI on http://localhost:6080/
+
+![](figs/android-web.pngv)
 
 Almost all labs are supposed to start in `lab-linux` container by starting a `bash` in it via:
 
@@ -239,6 +241,10 @@ $ docker exec -it lab-linux /bin/bash
 ```
 
 in which the work directory is `/volumnes`, a shared folder with `~/volumes` on your host, you can replace `~/volumes` in `docker-compose.yml` with the path that you specify as the shared folder. It is the easiest way to share files between the host and the container.
+
+````{note}
+There are two version of Python on `lab-linux`: Python 3.6 is used in Lab 4 and must be specified as `python3` in commands, Python 2.7 is used in Lab 6 to run `AndroPyTool` and should be specified as `python`
+````
 
 Except for Lab 8, in which should install an `.apk` by:
 
