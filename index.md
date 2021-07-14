@@ -9,6 +9,7 @@ Lab 4: Processing encrypted data with Homomorphic Encryption (HE) <lab4/readme.m
 Lab 6: Behavior-based Mobile Malware Analysis and Detection <lab6/readme.md>
 Lab 7: Developing Mobile Malware <lab7/readme.md>
 Lab 8: Apps SQL Injection and Defense <lab8/readme.md>
+*Appendix: How to Create Prepared VMs for Labs <appendix.md>
 ```
 
 ## Indices and tables
