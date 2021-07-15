@@ -178,7 +178,7 @@ As we all know that a normal user cannot modify his/her own salary, however, fro
 00000', SALARY = '9990000
 ```
 
-to send a UPDATE request as:
+to send an UPDATE request as:
 
 ```sql
 UPDATE employee SET NICKNAME=..., EMAIL =..., ADDRESS=..., PASSWORD =..,               PHONE='00000', SALARY='999000'
