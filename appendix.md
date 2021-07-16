@@ -27,9 +27,30 @@ select `yes` and confirm, then run
 sudo adduser $USER wireshark
 ```
 
-Restart or log out. When you come back to this VM, you can lanuch Wireshark without root priviledge.
+Restart or log out. When you come back to this VM, you can launch Wireshark without root priviledge.
 
 ### Install Docker (Optional) \*
+
+It can be used in Lab 6 and set containers up (following [this manual](set-up-container.md)) in case the VM environment doesn't work for any lab.
+
+````
+sudo apt-get remove docker docker-engine docker.io containerd runc
+sudo apt-get update
+sudo apt-get install \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo \
+  "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io
+sudo usermod -aG docker $USER
+newgrp docker
+````
 
 
 ### Lab 4
@@ -92,6 +113,10 @@ make
 sudo -E make install
 ```
 
+````{error}
+Network manager on the VM may fail after changing `openssl` on it, you can fix it by the same operations in [this answer](https://stackoverflow.com/questions/61133615/mysql-usr-local-lib-libssl-so-1-1-version-openssl-1-1-1-not-found-required) and restart the VM
+````
+
 ### Lab 7
 
 Install Metasploit framework:
@@ -105,6 +130,39 @@ Install `adb`
 ```
 sudo apt install adb
 ```
+
+### Lab 6
+
+Clone only [Android.Spy.277.origin](https://github.com/ashishb/android-malware/tree/master/Android.Spy.277.origin) folder of [
+android-malware](https://github.com/ashishb/android-malware) collection. The information about them can be found in [this post](https://www.theregister.com/2016/04/26/android_malware_whack_a_mole/).
+
+```sh
+mkdir android-malware
+cd android-malware
+wget https://github.com/ashishb/android-malware/raw/master/unclassified_apks/com.squareup.apk
+```
+
+Install FlowDroid
+
+```
+sudo apt-get install openjdk-8-jdk openjdk-8-jre
+wget https://github.com/secure-software-engineering/FlowDroid/releases/download/v2.8/soot-infoflow-cmd-jar-with-dependencies.jar
+```
+
+Download [SourcesAndSinks.txt](https://raw.githubusercontent.com/secure-software-engineering/FlowDroid/develop/soot-infoflow-android/SourcesAndSinks.txt) from the lab manual.
+
+```
+wget https://raw.githubusercontent.com/secure-software-engineering/FlowDroid/develop/soot-infoflow-android/SourcesAndSinks.txt
+```
+
+Test
+
+```
+docker run --volume=$HOME/android-malware:/apks alexmyg/andropytool  -s /apks/ -vt <my-vt-key> -all
+```
+
+
+
 
 ## Create an Android VM
 
@@ -131,7 +189,9 @@ Select "Advanced options" -> "Auto Installation" -> "Create/Modify partitions" -
 
 After installing Android OS, it requires you set up some initial settings, you can simply skip it and use default settings.
 
-After entering the home screen, check "Unknown source" in "Settings" -> "Secure" to allow you install `.apk` from Internet.
+After entering the home screen, check "Unknown source" in "Settings" -> "Secure" to allow you install `.apk` from Internet. Turn off the Play Store Protection from "Play Store" -> "Settings":
+
+![](figs/play-store-protect.png)
 
 Open Chrome browser app on it, download `apk`s:
 
