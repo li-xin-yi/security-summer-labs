@@ -4,183 +4,97 @@ A collection of malware `apk`s: [android-malware](https://github.com/ashishb/and
  
 ## Set-up
 
-### Pre-analysis
 
-Use the `reverse_tcp.apk` we constructed in [Lab 7](../lab7/readme.md).
+`````{tabbed} FlowDroid
 
-`````{tabbed} Pre-analysis
-
-**Find the SDK Version**
-
-Install Android Command Line Tool
+Install Dependencies:
 
 ```
-$ wget https://dl.google.com/android/repository/commandlinetools-linux-7302050_latest.zip
-$ unzip commandlinetools-linux-7302050_latest.zip
-$ mv cmdline-tools lastest
-$ mkdir cmdline-tools
-$ mv lastest cmdline-tools/
+$ sudo apt-get install openjdk-8-jdk openjdk-8-jre android-sdk
 ```
 
-Use the `apkanalyzer` tool included in it check the target SDK version
+Find the SDK folder, it is usually located in `/usr/lib/android-sdk/`. Set it as an enviroment variable
 
 ```
-$ cd cmdline-tools/lastest/bin
-$ ./apkanalyzer -h apk features ~/reverse_tcp.apk
-17
+export ANDROID_SDK=/usr/lib/android-sdk/
 ```
 
-````{note}
-
-`apkanalyzer` can also conduct a series of simple analyses upon `.apk` files. For example:
-
-```
-$ ./apkanalyzer -h apk features ~/reverse_tcp.apk
-android.hardware.location.gps implied: requested android.permission.ACCESS_FINE_LOCATION permission, and targetSdkVersion < 21
-android.hardware.camera
-android.hardware.camera.autofocus
-android.hardware.microphone
-android.hardware.location.network implied: requested android.permission.ACCESS_COARSE_LOCATION permission, and targetSdkVersion < 21
-android.hardware.telephony implied: requested a telephony permission
-android.hardware.location implied: requested android.permission.ACCESS_COARSE_LOCATION permission, and requested android.permission.ACCESS_FINE_LOCATION permission
-android.hardware.wifi implied: requested android.permission.ACCESS_WIFI_STATE permission, and requested android.permission.CHANGE_WIFI_STATE permission
-android.hardware.faketouch implied: default feature for all apps
-```
-
-````
-
-The default SDK root is `~/Android/Sdk` to install the target SDK for this app, we should use `sdkmanager` tool as:
-
-```
-$./sdkmanager "platform-tools" "platforms;android-17"
-```
-
-`````
-
-`````{tabbed} DroidFlow
 Download [`SourcesAndSinks.txt`](https://raw.githubusercontent.com/secure-software-engineering/FlowDroid/develop/soot-infoflow-android/SourcesAndSinks.txt) from DroidFlow project
 
-**Install [DroidFlow](https://github.com/secure-software-engineering/FlowDroid)**
+```
+wget https://raw.githubusercontent.com/secure-software-engineering/FlowDroid/develop/soot-infoflow-android/SourcesAndSinks.txt
+```
+
+**Install [FlowDroid](https://github.com/secure-software-engineering/FlowDroid)**
 
 Download `soot-infoflow-cmd-jar-with-dependencies.jar`
 
 ```
 $ wget https://github.com/secure-software-engineering/FlowDroid/releases/download/v2.8/soot-infoflow-cmd-jar-with-dependencies.jar
 ```
-`````
-
-`````{tabbed} AndroPyTool/DroidBox
-
-Follow the [guide](https://alexmyg.github.io/AndroPyTool/):
-
-1. Install [Docker](https://docs.docker.com/engine/install/ubuntu/)
-2. Apply a [VirusTotal](https://www.virustotal.com/) API Key *(optional)*
-3. Pull the docker image:
-
-```
-$ docker pull alexmyg/andropytool
-```
-
-`````
 
 
+## FlowDroid: Static Analysis
 
-## Static Analysis
+FlowDroid [^1] is a context-, flow-, field-, object-sensitive and lifecycle-aware static taint analysis tool for Android applications. It is based on [Soot](http://www.sable.mcgill.ca/soot/) and [Heros](http://sable.github.io/heros/). A very precise call-graph is used to ensure flow- and context-sensitivity. For the purpose of malware detection, FlowDroid statically computes **data-flows** in Android apps and Java programs, which is intented to find out data leaks.
 
-Use `FlowDroid` to detect:
+[^1]: Arzt, Steven, et al. "[Flowdroid: Precise context, flow, field, object-sensitive and lifecycle-aware taint analysis for android apps.](https://www.bodden.de/pubs/far+14flowdroid.pdf)" *Acm Sigplan Notices* 49.6 (2014): 259-269.
+
+For example, [`Claco.A.apk`](https://github.com/ashishb/android-malware/tree/master/BreakBottleneck/SamplesOfHIP2014TalkBreakBottleneck/Claco.A) [^2] is an Android malicious app that steals text messages, contacts and all SD Card files, and it can also automatically execute downloaded `svchosts.exe` when the phone is connected to the PC in the USB drive emulation mode. `svchosts.exe` can record sound around the infected PC and upload to remote servers.
+
+[^2]: See this slides: https://github.com/ashishb/android-malware/raw/master/BreakBottleneck/Break%20Bottleneck.pdf 
+
+Before running `FlowDroid` with downloaded `Claco.A.apk`, we must specify a  definition file for sources and sinks, which defines what use a default shall be treated as a source of sensitive information and what shall be treated as a sink that can possibly leak sensitive data to the outside world. `SourcesAndSinks.txt` provided by FlowDroid homepage demo is targeted on looking for privacy issues, we can apply it for our example to analyze the data-flow in `Claco.A.apk`:
 
 ```
-$ java -jar soot-infoflow-cmd-jar-with-dependencies.jar -a reverse_tcp.apk -p Android/Sdk/platforms/ -s SourcesAndSinks.txt
+$ java -jar soot-infoflow-cmd-jar-with-dependencies.jar -a Claco.A.apk -p $ANDROID_SDK/platforms/ -s SourcesAndSinks.txt
 ```
 
-It gives:
+It will give a long report about the analysis result:
+
 
 ```
-[main] INFO soot.jimple.infoflow.cmd.MainClass - Analyzing app ~/reverse_tcp.apk (1 of 1)...
-[main] INFO soot.jimple.infoflow.android.SetupApplication - Initializing Soot...
-[main] INFO soot.jimple.infoflow.android.SetupApplication - Loading dex files...
-[main] INFO soot.jimple.infoflow.android.SetupApplication - ARSC file parsing took 0.003899714 seconds
-[main] INFO soot.jimple.infoflow.memory.MemoryWarningSystem - Registered a memory warning system for 14,428.8 MiB
-[main] INFO soot.jimple.infoflow.android.entryPointCreators.AndroidEntryPointCreator - Creating Android entry point for 3 components...
-[main] INFO soot.jimple.infoflow.android.SetupApplication - Constructing the callgraph...
-[main] INFO soot.jimple.infoflow.android.callbacks.DefaultCallbackAnalyzer - Collecting callbacks in DEFAULT mode...
-[main] INFO soot.jimple.infoflow.android.callbacks.DefaultCallbackAnalyzer - Callback analysis done.
-[main] INFO soot.jimple.infoflow.android.entryPointCreators.AndroidEntryPointCreator - Creating Android entry point for 3 components...
-[main] INFO soot.jimple.infoflow.android.SetupApplication - Constructing the callgraph...
-[main] INFO soot.jimple.infoflow.android.callbacks.DefaultCallbackAnalyzer - Running incremental callback analysis for 3 components...
-[main] INFO soot.jimple.infoflow.android.callbacks.DefaultCallbackAnalyzer - Incremental callback analysis done.
-[main] INFO soot.jimple.infoflow.memory.MemoryWarningSystem - Shutting down the memory warning system...
-[main] INFO soot.jimple.infoflow.android.SetupApplication - Callback analysis terminated normally
-[main] INFO soot.jimple.infoflow.android.SetupApplication - Entry point calculation done.
-[main] WARN soot.jimple.infoflow.android.data.parsers.PermissionMethodParser - Line does not match: <org.springframework.web.servlet.tags.UrlTag: java.lang.String createUrl)> -> _SINK_
-[main] WARN soot.jimple.infoflow.android.data.parsers.PermissionMethodParser - Line does not match: <org.springframework.orm.hibernate3.support.ClobStringType: int[] sqlTypes)> -> _SINK_
-[main] WARN soot.jimple.infoflow.android.data.parsers.PermissionMethodParser - Line does not match: <org.springframework.security.config.http.CsrfBeanDefinitionParser: org.springframework.beans.factory.config.BeanDefinition getCsrfLogoutHandler)> -> _SOURCE_
-[main] WARN soot.jimple.infoflow.android.data.parsers.PermissionMethodParser - Line does not match: <java.io.File: java.io.File getAbsoluteFile)> -> _SOURCE_
-[main] WARN soot.jimple.infoflow.android.data.parsers.PermissionMethodParser - Line does not match: <org.springframework.security.config.http.FormLoginBeanDefinitionParser: java.lang.String getLoginPage)> -> _SOURCE_
-[main] WARN soot.jimple.infoflow.android.data.parsers.PermissionMethodParser - Line does not match: <com.google.auth.oauth2.UserCredentials: java.lang.String getClientSecret)> -> _SOURCE_
-[main] WARN soot.jimple.infoflow.android.data.parsers.PermissionMethodParser - Line does not match: <org.springframework.web.servlet.tags.UrlTag: java.lang.String createUrl)> -> _SOURCE_
-[main] WARN soot.jimple.infoflow.android.data.parsers.PermissionMethodParser - Line does not match: <java.io.File: java.io.File getCanonicalFile)> -> _SOURCE_
-[main] WARN soot.jimple.infoflow.android.data.parsers.PermissionMethodParser - Line does not match: <org.apache.xmlrpc.webserver.RequestData: java.lang.String getMethod)> -> _SOURCE_
-[main] WARN soot.jimple.infoflow.android.data.parsers.PermissionMethodParser - Line does not match: <org.dmfs.oauth2.client.http.requests.ResourceOwnerPasswordTokenRequest: org.dmfs.httpclient.HttpRequestEntity requestEntity)> -> _SOURCE_
-[main] WARN soot.jimple.infoflow.android.data.parsers.PermissionMethodParser - Line does not match: <org.springframework.security.concurrent.DelegatingSecurityContextExecutorService: java.util.concurrent.ExecutorService getDelegate)> -> _SOURCE_
-[main] WARN soot.jimple.infoflow.android.data.parsers.PermissionMethodParser - Line does not match: <org.springframework.security.config.annotation.web.builders.HttpSecurity: org.springframework.security.config.'annotation'.web.configurers.HeadersConfigurer headers)> -> _SOURCE_
-[main] WARN soot.jimple.infoflow.android.data.parsers.PermissionMethodParser - Line does not match: <org.springframework.web.servlet.tags.EscapeBodyTag: java.lang.String readBodyContent)> -> _SOURCE_
-[main] WARN soot.jimple.infoflow.android.data.parsers.PermissionMethodParser - Line does not match: <org.springframework.security.config.http.FormLoginBeanDefinitionParser: java.lang.String getLoginProcessingUrl)> -> _SOURCE_
-[main] WARN soot.jimple.infoflow.android.data.parsers.PermissionMethodParser - Line does not match: <org.springframework.security.config.annotation.web.configurers.LogoutConfigurer: java.util.List getLogoutHandlers)> -> _SOURCE_
-[main] WARN soot.jimple.infoflow.android.data.parsers.PermissionMethodParser - Line does not match: <org.apache.xmlrpc.webserver.RequestData: java.lang.String getHttpVersion)> -> _SOURCE_
-[main] WARN soot.jimple.infoflow.android.data.parsers.PermissionMethodParser - Line does not match: <com.google.auth.oauth2.DefaultCredentialsProvider: java.io.File getWellKnownCredentialsFile)> -> _SOURCE_
-[main] WARN soot.jimple.infoflow.android.data.parsers.PermissionMethodParser - Line does not match: <org.apache.xmlrpc.webserver.HttpServletRequestImpl: void parseParameters)> -> _SOURCE_
-[main] WARN soot.jimple.infoflow.android.data.parsers.PermissionMethodParser - Line does not match:
-[main] INFO soot.jimple.infoflow.android.source.AccessPathBasedSourceSinkManager - Created a SourceSinkManager with 68 sources, 194 sinks, and 4 callback methods.
-[main] INFO soot.jimple.infoflow.android.SetupApplication - Collecting callbacks and building a callgraph took 5 seconds
-[main] INFO soot.jimple.infoflow.android.SetupApplication - Running data flow analysis on /home/xinyi/reverse_tcp.apk with 68 sources and 194 sinks...
-[main] INFO soot.jimple.infoflow.InfoflowConfiguration - Implicit flow tracking is NOT enabled
-[main] INFO soot.jimple.infoflow.InfoflowConfiguration - Exceptional flow tracking is enabled
-[main] INFO soot.jimple.infoflow.InfoflowConfiguration - Running with a maximum access path length of 5
-[main] INFO soot.jimple.infoflow.InfoflowConfiguration - Using path-agnostic result collection
-[main] INFO soot.jimple.infoflow.InfoflowConfiguration - Recursive access path shortening is enabled
-[main] INFO soot.jimple.infoflow.InfoflowConfiguration - Taint analysis enabled: true
-[main] INFO soot.jimple.infoflow.InfoflowConfiguration - Using alias algorithm FlowSensitive
-[main] INFO soot.jimple.infoflow.memory.MemoryWarningSystem - Registered a memory warning system for 14,428.8 MiB
+...
+[main] INFO soot.jimple.infoflow.android.SetupApplication - Collecting callbacks and building a callgraph took 1 seconds
+[main] INFO soot.jimple.infoflow.android.SetupApplication - Running data flow analysis on Claco.A.apk with 68 sources and 194 sinks...
+...
 [main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - Callgraph construction took 0 seconds
-[main] INFO soot.jimple.infoflow.codeOptimization.InterproceduralConstantValuePropagator - Removing side-effect free methods is disabled
-[main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - Dead code elimination took 0.07780257 seconds
-[main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - Callgraph has 217 edges
-[main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - Starting Taint Analysis
-[main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - Using context- and flow-sensitive solver
-[main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - Using context- and flow-sensitive solver
-[main] WARN soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - Running with limited join point abstractions can break context-sensitive path builders
-[main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - Looking for sources and sinks...
-[main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - Source lookup done, found 2 sources and 5 sinks.
-[main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - Taint wrapper hits: 32
-[main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - Taint wrapper misses: 18
-[main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - IFDS problem with 549 forward and 20 backward edges solved in 0 seconds, processing 2 results...
-[main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - Current memory consumption: 115 MB
-[main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - Memory consumption after cleanup: 39 MB
-[main] INFO soot.jimple.infoflow.data.pathBuilders.BatchPathBuilder - Running path reconstruction batch 1 with 2 elements
-[main] INFO soot.jimple.infoflow.data.pathBuilders.ContextSensitivePathBuilder - Obtainted 2 connections between sources and sinks
-[main] INFO soot.jimple.infoflow.data.pathBuilders.ContextSensitivePathBuilder - Building path 1...
-[main] INFO soot.jimple.infoflow.data.pathBuilders.ContextSensitivePathBuilder - Building path 2...
-[main] INFO soot.jimple.infoflow.memory.MemoryWarningSystem - Shutting down the memory warning system...
-[main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - Memory consumption after path building: 38 MB
-[main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - Path reconstruction took 0 seconds
+...
+[main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - IFDS problem with 10212 forward and 4505 backward edges solved in 0 seconds, processing 14 results...
+[main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - Current memory consumption: 249 MB
+[main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - Memory consumption after cleanup: 35 MB
+[main] INFO soot.jimple.infoflow.data.pathBuilders.BatchPathBuilder - Running path reconstruction batch 1 with 5 elements
+[main] INFO soot.jimple.infoflow.data.pathBuilders.ContextSensitivePathBuilder - Obtainted 5 connections between sources and sinks
+...
+[main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - The sink virtualinvoke $r7.<java.io.FileOutputStream: void write(byte[])>($r8) in method <smart.apps.droidcleaner.Tools: boolean GetContacts(android.content.Context)> was called with values from the following sources:
+...
+[main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - - r5 = interfaceinvoke $r4.<android.database.Cursor: java.lang.String getString(int)>($i0) in method <smart.apps.droidcleaner.Tools: boolean GetContacts(android.content.Context)>
+...
+<smart.apps.droidcleaner.Tools: boolean GetAllSMS(android.content.Context)> was called with values from the following sources:
+...
+[main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - - $r9 = interfaceinvoke $r4.<android.database.Cursor: java.lang.String getString(int)>($i1) in method <smart.apps.droidcleaner.Tools: boolean GetAllSMS(android.content.Context)>
+[main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - The sink virtualinvoke $r13.<java.io.DataOutputStream: void write(byte[],int,int)>(r5, 0, $i0) in method <smart.apps.droidcleaner.Tools: boolean UploadFile(java.lang.String,java.lang.String,java.lang.String,java.lang.String,android.content.Context)> was called with values from the following sources:
+[main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - Data flow solver took 1 seconds. Maximum memory consumption: 249 MB
+[main] INFO soot.jimple.infoflow.android.SetupApplication - Found 11 leaks
+```
+
+It first determines the sources and sinks in the decompiled codes according to `SourcesAndSinks.txt`, and then build a call-graph and construct path between sources and sinks. Finally it finds out some data-flows comes from identified sensitive sources but never go into any legal sinks, which means sensitive data leaks. For example, from the report above, method `GetContacts`, `GetAllSMS` and `UploadFile` are called with private data as context but data is then flow into somewhere not in defined sinks, which probably matches the behavior we describe above. Thus, `FlowDroid` can detect privacy leakage issues in this app. 
+
+```{note}Deliverable 1
+Can you run `FlowDroid` with a similar configuration to explore the privacy issue in the malware `reverse_tcp`, which you have created in previous Lab 7? And then describe what happens, is there any data leakage? If there is, point out which lines in the outputs helps you locate the data leakage?
+```
+
+````{important}Answer 1
+Run 
+```
+java -jar soot-infoflow-cmd-jar-with-dependencies.jar -a reverse_tcp.apk -p $ANDROID_SDK/platforms/ -s SourcesAndSinks.txt
+```
+Yes, there is one data leakage found in last few lines of the outputs:
+```
+...
 [main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - The sink virtualinvoke $r19.<java.io.FileOutputStream: void write(byte[])>($r18) in method <com.metasploit.stage.Payload: void a(java.io.DataInputStream,java.io.OutputStream,java.lang.Object[])> was called with values from the following sources:
 [main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - - $r17 = virtualinvoke $r22.<java.net.URLConnection: java.io.InputStream getInputStream()>() in method <com.metasploit.stage.Payload: void main(java.lang.String[])>
-[main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - Data flow solver took 0 seconds. Maximum memory consumption: 115 MB
+[main] INFO soot.jimple.infoflow.android.SetupApplication$InPlaceInfoflow - Data flow solver took 0 seconds. Maximum memory consumption: 50 MB
 [main] INFO soot.jimple.infoflow.android.SetupApplication - Found 1 leaks
 ```
-
-## Dynamic Analysis
-
-Create a new directory `malware` to place the `reverse_tcp.apk`:
-
-```
-$ mkdir malware
-$ cp reverse_tcp.apk malware/
-```
-
-Start `andropytool` in a docker container, `/home/ubuntu/malware` is an example of the absolute path, `<api-key>` is the API key obtained from [VirusTotal](https://www.virustotal.com/):
-
-```
-$ sudo docker run --volume=/home/ubuntu/malware:/apks alexmyg/andropytool  -s /apks/ -vt <api-key> -all
-```
+````
