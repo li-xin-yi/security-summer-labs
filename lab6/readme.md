@@ -33,7 +33,7 @@ Download `soot-infoflow-cmd-jar-with-dependencies.jar`
 $ wget https://github.com/secure-software-engineering/FlowDroid/releases/download/v2.8/soot-infoflow-cmd-jar-with-dependencies.jar
 ```
 
-````
+`````
 
 `````{tabbed} Mobile Security Framework (MobSF)
 
@@ -60,7 +60,7 @@ When "Session stack builder" finishes, it says that "Your session is ready", the
 
 Click on "8000" in this page:
 
-![](dcoker-online.png)
+![](docker-online.png)
 
 And finally you can see such a web application on port 8000:
 
@@ -68,16 +68,13 @@ And finally you can see such a web application on port 8000:
 `````
 
 
-
-
-
 ## FlowDroid: Static Analysis
 
-FlowDroid [^1] is a context-, flow-, field-, object-sensitive and lifecycle-aware static taint analysis tool for Android applications. It is based on [Soot](http://www.sable.mcgill.ca/soot/) and [Heros](http://sable.github.io/heros/). A very precise call-graph is used to ensure flow- and context-sensitivity. For the purpose of malware detection, FlowDroid statically computes **data-flows** in Android apps and Java programs, which is intented to find out data leaks.
+FlowDroid [^1] is a context-, flow-, field-, object-sensitive and lifecycle-aware static taint analysis tool for Android applications. It is based on [Soot](http://www.sable.mcgill.ca/soot/) and [Heros](http://sable.github.io/heros/). A very precise call-graph is used to ensure flow- and context-sensitivity. For the purpose of malware detection, FlowDroid statically computes **data-flows** in Android apps and Java programs, which is utilized to find out data leaks.
 
 [^1]: Arzt, Steven, et al. "[Flowdroid: Precise context, flow, field, object-sensitive and lifecycle-aware taint analysis for android apps.](https://www.bodden.de/pubs/far+14flowdroid.pdf)" *Acm Sigplan Notices* 49.6 (2014): 259-269.
 
-For example, [`Claco.A.apk`](https://github.com/ashishb/android-malware/tree/master/BreakBottleneck/SamplesOfHIP2014TalkBreakBottleneck/Claco.A) [^2] is an Android malicious app that steals text messages, contacts and all SD Card files, and it can also automatically execute downloaded `svchosts.exe` when the phone is connected to the PC in the USB drive emulation mode. `svchosts.exe` can record sound around the infected PC and upload to remote servers.
+For example, [`Claco.A.apk`](https://github.com/ashishb/android-malware/tree/master/BreakBottleneck/SamplesOfHIP2014TalkBreakBottleneck/Claco.A) [^2] is an Android malicious app that steals text messages, contacts and all SD Card files, and it can also automatically execute downloaded `svchosts.exe` when the phone is connected to the PC in the USB drive emulation mode. `svchosts.exe` can record sounds around the infected PC and upload them to remote servers.
 
 [^2]: See this slides: https://github.com/ashishb/android-malware/raw/master/BreakBottleneck/Break%20Bottleneck.pdf 
 
@@ -117,11 +114,15 @@ It will give a long report about the analysis result:
 
 It first determines the sources and sinks in the decompiled codes according to `SourcesAndSinks.txt`, and then build a call-graph and construct path between sources and sinks. Finally it finds out some data-flows comes from identified sensitive sources but never go into any legal sinks, which means sensitive data leaks. For example, from the report above, method `GetContacts`, `GetAllSMS` and `UploadFile` are called with private data as context but data is then flow into somewhere not in defined sinks, which probably matches the behavior we describe above. Thus, `FlowDroid` can detect privacy leakage issues in this app. 
 
-```{note} Deliverable 1
+```{admonition} Deliverable 1
 Can you run `FlowDroid` with a similar configuration to explore the privacy issue in the malware `reverse_tcp`, which you have created in previous Lab 7? And then describe what happens, is there any data leakage? If there is, point out which lines in the outputs helps you locate the data leakage?
 ```
 
-````{important} Answer 1
+````{admonition} Answer 1
+---
+class: hint
+---
+
 Run 
 ```
 java -jar soot-infoflow-cmd-jar-with-dependencies.jar -a reverse_tcp.apk -p $ANDROID_SDK/platforms/ -s SourcesAndSinks.txt
@@ -144,7 +145,7 @@ Yes, there is one data leakage found in last few lines of the outputs:
 We will not build with the *dynamic analysis* feature in this lab for that the associated Android VMs cannot be simply configured in VMs and Docker containers. If you are still interested in this feature, read its [docs](https://mobsf.github.io/docs) or email us for help.
 ```
 
-It runs as a web application that you can simply upload `.apk` files for a more comprehesive analysis. In the following of this section, we will domenstrate how to use it to detect malwares.
+It runs as a web application that you can simply upload `.apk` files for a more comprehensive analysis. In the following of this section, we will domenstrate how to use it to detect malware.
 
 For example, [`Dropdialer.apk`](https://github.com/ashishb/android-malware/blob/master/BreakBottleneck/SamplesOfHIP2014TalkBreakBottleneck/Dropdialer.A/Dropdialer.apk)[^2] guises as an app supposedly used to set wallpapers. However it downloads another file in the background. It then tricks users to install the downloaded file. 
 
@@ -184,4 +185,84 @@ The URL `http://dl.dropbox.com/u/87265868/srv.txt` with domain `dl.dropbox.com` 
 
 All the analysis results matches the malicious behaviors that `Dropdialer.apk` is designed for. 
 
-[^3]: `.smali` is a human-readable dex fromat used in Android's Java VM implementation. But we do not recommend reading this low-level representation here. More information about it can be found in https://github.com/JesusFreke/smali
+[^3]: `.smali` is a human-readable dex format used in Android's Java VM implementation. But we do not recommend reading this low-level representation here. More information about it can be found in https://github.com/JesusFreke/smali
+
+````{admonition} Deliverable 2
+Please analyze the `reverse_tcp.apk` with MobSF and 
+
+1. list out what dangerous permissions are required by this app? 
+2. list out what potential malicious behavious may be perfomed by this app?
+````
+
+````{admonition} Answer 2
+---
+class: tip
+---
+
+1. `ACCESS_COARSE_LOCATION`, `ACCESS_FINE_LOCATION`, `CALL_PHONE`, `CAMERA`, `READ_CALL_LOG`, `READ_CONTACTS`, `READ_PHONE_STATE`, `READ_SMS`, `RECEIVE_SMS`, `RECORD_AUDIO`, `SEND_SMS`, `WRITE_CALL_LOG`, `WRITE_CONTACTS`, `WRITE_EXTERNAL_STORAGE`, `WRITE_SETTINGS`
+2. 7 behaviors in QUARK ANALYSIS:
+   - Acquire lock on Power Manager
+   - Get absolute path of the file and store in string
+   - Hide the current app's icon
+   - Instantiate new object using reflection, possibly used for dexClassLoader
+   - Load external class
+   - Method reflection
+   - Monitor the general action to be performed
+````
+
+## VirusTotal: Online Tool
+
+Though FlowDroid and MosBF can detect some potential malicious codes by static analysis, many malicious behaviors still remain undetected before runtime. [VirusTotal](https://www.virustotal.com/gui/) is an online web application that aggregates many antivirus products and online scan engines to check for malicious behaviors in user's uploaded `apk` files. Besides, it also applies dynamic analysis for malwares using  Cuckoo sandbox.
+
+````{warning}
+You must first register an account on [virustotal](https://www.virustotal.com/) and log in, otherwise the dynamic analysis may not launch.
+````
+
+For example, [`Obad.A.apk`](https://github.com/ashishb/android-malware/raw/master/BreakBottleneck/SamplesOfHIP2014TalkBreakBottleneck/Obad.A/Obad.A.apk) [^2] is a sophisticated Android malware, it
+
+-  sends SMS to premium-rate numbers;
+-  downloads other malware programs, installs them on the infected device and/or
+send them further via Bluetooth;
+-  is remotely performed by commands in the console
+-  is of highly complexity and exploits a number of unpublished vulnerabilities (at that time, 2014)
+
+We open the VirusTotal offical website: [www.virustotal.com](https://www.virustotal.com/gui/home/upload) and upload `Obad.A.apk`
+
+![](vt-home.png)
+
+The result report comes up soon, it is definitely classified as malware by thoses scanners listed on Detection panel:
+
+![](vt-detection.png)
+
+In Details panel, it also gives similar brief results with MobSF, let's skip it and move to Relation panel:
+
+![](relation.png)
+
+Because VirusTotal first calculate hash value and check if the app was uploaded by users before, if it was scanned before, it directly shows the existing results. We can see what domains or IP address the app contacted when it was executed in a sandbox. It also gives a graph summary about what files and addresses the app is related to when running:
+
+![](vt-graph.png)
+
+For more detailed run-time behaviors of this app, we can move to Behaviors panel:
+
+![](vt-behavior.png)
+
+It recorded all network communications and file system actions, we also notice that the app executed very dangerous shell commands
+
+![](sudo.png)
+
+By the way, you can also review the comments about this app, which are posted by other users in Community panel.
+
+````{admonition} Deliverable 3
+Please analyze `reverse_tcp` with VirusTotal and describe what IP address it will contact in runtime as well as other behaviors? Give a screenshoot.
+````
+
+````{admonition} Answer 3
+---
+class: tip
+---
+Actually, it depends.
+
+![](vt-answer.png)
+````
+
+
