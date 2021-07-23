@@ -1,6 +1,5 @@
 # Lab 6: Behavior-based Mobile Malware Analysis and Detection
 
-A collection of malware `apk`s: [android-malware](https://github.com/ashishb/android-malware/)
  
 ## Set-up
 
