@@ -252,4 +252,9 @@ Select the last one (`360`) and you will enter a portrait screen:
 If the VirtualBox window doesn't fit the screen you can modify the scale in View menu. Now you can also modify `menu.lst` with `VGA=864` (`360` is in hex-format, its dec value is `864`), after that it will become `600*1080*32` by default in case you are tired of choosing the screen resolution every time.
 
 
+## Create a Minimal Ubuntun VM
+
+Follow [Create a Ubuntu VM on VirtualBox](#create-a-ubuntu-vm-on-virtualbox) above, in which only [Docker](#install-docker-optional) and [Wireshark](#install-wireshark).
+
+
 
