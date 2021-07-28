@@ -256,5 +256,8 @@ If the VirtualBox window doesn't fit the screen you can modify the scale in View
 
 Follow [Create a Ubuntu VM on VirtualBox](#create-a-ubuntu-vm-on-virtualbox) above, in which only [Docker](#install-docker-optional) and [Wireshark](#install-wireshark).
 
+Install `net-tools` for debugging
 
-
+```
+sudo apt install net-tools
+```

