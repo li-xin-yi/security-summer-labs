@@ -11,9 +11,7 @@ COPY SourcesAndSinks.txt /root
 ENV PATH=$JAVA_HOME/bin:$PATH
 ENV ANDROID_SDK=/usr/lib/android-sdk/
 
-RUN mkdir /root/apks
-
-VOLUME /root/volume
+VOLUME ["/root/apks"]
 WORKDIR /root/apks
 
 RUN wget https://github.com/ashishb/android-malware/raw/master/BreakBottleneck/SamplesOfHIP2014TalkBreakBottleneck/Claco.A/Claco.A.apk
@@ -23,5 +21,7 @@ RUN wget https://github.com/ashishb/android-malware/raw/master/BreakBottleneck/S
 WORKDIR /root/Mobile-Security-Framework-MobSF
 COPY lab_entry.sh .
 RUN chmod +x lab_entry.sh
+
+
 
 CMD ["/root/Mobile-Security-Framework-MobSF/lab_entry.sh"]

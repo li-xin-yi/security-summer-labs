@@ -16,9 +16,8 @@ services:
                 ipv4_address: 10.9.0.6
     
     Attack:
-        image: yangzhou301/lab7
+        image: yangzhou301/lab7-wireshark
         container_name: attacker
-        build: .
         tty: true
         cap_add:
             - NET_ADMIN

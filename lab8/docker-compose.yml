@@ -2,8 +2,7 @@ version: "3"
 
 services: 
     mobile:
-        image: yangzhou301/lab8
-        build: .
+        image: yangzhou301/lab-android
         container_name: mobile
         privileged: true
         restart: on-failure
