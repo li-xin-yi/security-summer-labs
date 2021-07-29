@@ -14,49 +14,23 @@ In general, a *fully* homomorphic encryption system supports both addition and m
 
 ## Set-up
 
-Install Python and `pip`
-
-```
-$ sudo apt install python3-dev
+```{note}
+This lab should be done on Ubuntu 20.04 VM. All environments (including Python 3.8, [python-paillier](https://github.com/data61/python-paillier) and  [Pyfhel](https://github.com/ibarrond/Pyfhel)) are pre-built within the Docker image [yangzhou301/lab4](https://hub.docker.com/r/yangzhou301/lab4), on which `/root/volume` is a shared folder with `lab4/volume` on VM host. If you need to transfer other course materials into the container, place them in `lab4/volume`.
 ```
 
-````{tabbed} Python
-Create a virtual Python environment named `he-lab`
+Pull the lab image 
 
 ```
-$ pip install virtualenv
-$ virtualenv he-lab
-$ source ~/he-lab/bin/activate
+$ docker pull yangzhou301/lab4
 ```
 
-Install [python-paillier](https://github.com/data61/python-paillier):
+Start the Docker container:
 
 ```
-$ pip install phe
+$ docker run --rm -it -v $HOME/lab4/volume:/root/volume yangzhou301/lab4
 ```
 
-Install [Pyfhel](https://github.com/ibarrond/Pyfhel)
-
-```
-$ pip install Pyfhel
-```
-
-````
-
-````{tabbed} CLI
-Install [python-paillier](https://github.com/data61/python-paillier):
-
-```
-$ pip install phe[cli]
-```
-
-Check:
-
-```
-$ pheutil --version
-```
-
-````
+And now you get a shell at `/root/volume` directory of the container.
 
 ## Basic Property
 

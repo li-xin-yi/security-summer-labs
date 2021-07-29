@@ -1,8 +1,8 @@
 FROM python:3.8
 
-WORKDIR /usr/src/app
+VOLUME [ "/root/volume" ]
+WORKDIR /root/volume
 ENV PATH="/root/.local/bin:${PATH}"
-RUN pip install --no-cache-dir --user phe[cli] Pyfhel
-
+RUN pip install --user phe[cli] Pyfhel
 
 CMD ["/bin/bash"]
