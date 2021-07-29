@@ -4,68 +4,45 @@
  
 ## Set-up
 
-
-`````{tabbed} FlowDroid
-
-Install Dependencies:
-
-```
-$ sudo apt-get install openjdk-8-jdk openjdk-8-jre android-sdk
+```{note}
+In this lab, three malware samples are already downloaded in `lab6/apks` on Ubuntu 20.04 VM, you still need to use the `reverse_tcp` in created before, which is supposed to be located in `lab7/volume` as malware used in all deliverables. The environment for analysis and detection are pre-built in Docker image [yangzhou301/lab6](https://hub.docker.com/r/yangzhou301/lab6), on which `/root/apks` is a shared folder mapping to `lab6/apks` on host.
 ```
 
-Find the SDK folder, it is usually located in `/usr/lib/android-sdk/`. Set it as an enviroment variable
+Open `lab6/apks` folder to check if the `.apk` files mentioned in this lab are prepared:
 
 ```
-export ANDROID_SDK=/usr/lib/android-sdk/
+$ cd ~/lab6
+$ ls apks
+Claco.A.apk  Dropdialer.apk  Obad.A.apk
 ```
 
-Download [`SourcesAndSinks.txt`](https://raw.githubusercontent.com/secure-software-engineering/FlowDroid/develop/soot-infoflow-android/SourcesAndSinks.txt) from DroidFlow project
+Copy `reverse_tcp` you created in Lab 7 to `apks` folder
 
 ```
-wget https://raw.githubusercontent.com/secure-software-engineering/FlowDroid/develop/soot-infoflow-android/SourcesAndSinks.txt
+$ cp ~/lab7/volume/reverse_tcp.apk ~/lab6/apks
 ```
 
-**Install [FlowDroid](https://github.com/secure-software-engineering/FlowDroid)**
-
-Download `soot-infoflow-cmd-jar-with-dependencies.jar`
+Pull the lab image 
 
 ```
-$ wget https://github.com/secure-software-engineering/FlowDroid/releases/download/v2.8/soot-infoflow-cmd-jar-with-dependencies.jar
+$ docker pull yangzhou301/lab6
 ```
 
-`````
-
-`````{tabbed} Mobile Security Framework (MobSF)
-
-If you have set-up Docker before, you can start it by pulling the image and running the container via Docker:
+Start the Docker container:
 
 ```
-docker pull opensecurity/mobile-security-framework-mobsf
-docker run -it --rm -p 8000:8000 opensecurity/mobile-security-framework-mobsf:latest
+$ docker run --rm -it -p 8000:8000 -v $HOME/lab6/apks:/root/apks yangzhou301/lab6
 ```
 
-And then open the web-broswer to check the link [http://localhost:8000/](http://localhost:8000/).
+Wait for the log info stops, and you get a shell at `/root` directory of the container:
 
-Otherwise, if you don't want to run Docker on your local machine, you can open the URL: [https://labs.play-with-docker.com/?stack=https://raw.githubusercontent.com/MobSF/Mobile-Security-Framework-MobSF/master/scripts/stack/docker-compose.yml](https://labs.play-with-docker.com/?stack=https://raw.githubusercontent.com/MobSF/Mobile-Security-Framework-MobSF/master/scripts/stack/docker-compose.yml) to run the Docker container as a web application online.
+![](container.png)
 
-```{warning}
-You may be asked to sign up with a DockerHub account first. After you register the account, log in and click on "Start". 
-```
-
-```{warning}
-When "Session stack builder" finishes, it says that "Your session is ready", then you can click on "CLOSE", if it doesn't work, just refresh the website.
-
-![](session_ready.png)
-```
-
-Click on "8000" in this page:
-
-![](docker-online.png)
-
-And finally you can see such a web application on port 8000:
+in which we will perform all operations involved with [FlowDroid](#flowdroid-static-analysis) later. Then, let's use Firefox web broswer to open [localhost:8000](http://localhost:8000/.), you can see a web application like 
 
 ![](mobsf_web.png)
-`````
+
+It's the web interface of [MobSF](#mobsf-static-analysis), which will be used later in this lab.
 
 
 ## FlowDroid: Static Analysis

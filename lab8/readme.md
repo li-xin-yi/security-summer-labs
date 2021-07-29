@@ -6,7 +6,13 @@ This lab is adapted from [SEED Labs – SQL Injection Attack Lab](https://seedse
 
 ## Set-up
 
+```{note}
 We adopt an android app named `SQL Inject Demo` ({download}`sql-inject-demo.apk`, source code available [li-xin-yi/sql_inject_demo](https://github.com/li-xin-yi/sql_inject_demo)) as our main environment. It should be installed on an android physical/virtual machine with API >= 17 (Android >= 4.2). We recommend a virtual machine of SDK API 25, which can be easily set-up either via [AVD manager integrated in Android Studio](https://developer.android.com/studio/run/emulator) or [SeedLab virtual machine on VirtualBox](https://seedsecuritylabs.org/Labs_16.04/Mobile/SEEDAndroid_VirtualBox.pdf).
+```
+
+In this lab, you can use our Android VM, on which `sql-inject-demo` is already installed:
+
+![](home.png)
 
 ## Task 0: Get familiar to the App
 

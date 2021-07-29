@@ -251,6 +251,12 @@ Select the last one (`360`) and you will enter a portrait screen:
 
 If the VirtualBox window doesn't fit the screen you can modify the scale in View menu. Now you can also modify `menu.lst` with `VGA=864` (`360` is in hex-format, its dec value is `864`), after that it will become `600*1080*32` by default in case you are tired of choosing the screen resolution every time.
 
+### Add contacts
+
+Follow the information used in [Lab 8](lab8/readme.html#task-0-get-familiar-to-the-app)
+
+![](figs/contacts.png)
+
 
 ## Create a Minimal Ubuntun VM
 
@@ -260,4 +266,10 @@ Install `net-tools` for debugging
 
 ```
 sudo apt install net-tools
+```
+
+## Clear bash history
+
+```
+history -c
 ```

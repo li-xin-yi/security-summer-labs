@@ -7,106 +7,33 @@
 
 ## Set-up
 
-### Install OpenABE
-
-[OpenABE](https://github.com/zeutro/openabe) is a cryptographic library that incorporates a variety of attribute-based encryption (ABE) algorithms, industry standard cryptographic functions and CLI tools, and an intuitive API
-
-Download and install dependencies:
-
-```
-$ sudo apt install python3-pip openssl
-$ git clone https://github.com/zeutro/openabe
-$ cd openabe
-$ sudo -E ./deps/install_pkgs.sh
+```{note}
+This lab should be done on Ubuntu 20.04 VM with the pre-built Docker image [yangzhou301/lab3](https://hub.docker.com/r/yangzhou301/lab3), in which [OpenABE](https://github.com/zeutro/openabe), a cryptographic library that incorporates a variety of attribute-based encryption (ABE) algorithms, industry standard cryptographic functions and CLI tools, and an intuitive API, is already installed.
 ```
 
-Compile:
+Pull the lab image 
 
 ```
-$ source ./env
-$ make
+$ docker pull yangzhou301/lab3
 ```
 
-```{error}
-If you encounter the error during `make`:
-
-    ERROR: cannot verify github.com's certificate
-Try
-
-    $ sudo apt install ca-certificates
-    $ printf "\nca_directory=/etc/ssl/certs" | sudo tee -a /etc/wgetrc
-
-And then start from the very beginning again.
-```
-
-````{error}
-If you encounter the error during `make`:
+Start the Docker container:
 
 ```
-libssh.so.4: undefined symbol: evp_pkey_get_raw_public_key, and version OPENSSL_1_1
-```
-and you can run `curl`,`openssl` normally in other shells (or after `make clean` in this shell)
-
-try
-
-```
-$ export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH
+$ docker run --rm -it  yangzhou301/lab3
 ```
 
-in which `/usr/lib/x86_64-linux-gnu/` is an example path of `libssl.so`
-
-````
-
-````{error}
-If you encounter the error during `make`:
-
-```
-../openabe/bin/bison: Command not found
-```
-
-Install `bison` and add the binary (suppose it in `/usr/bin`, you can find its location by `which bison`) to the folder
-
-```
-$ sudo apt install bison
-$ ln -s /usr/bin/bison /absolute-path-of-openabe/openabe/bin/bison
-```
-
-````
-
-Run unit tests
-
-```
-$ make test
-```
-
-After all unit tests pass, install the `OpenABE` in a standard location (`/usr/local`):
-
-```
-$ make install
-```
-
-```{error}
-If it fails with a write permission, try
-
-    $ sudo -s
-    # source ./env
-    # make install
-    # exit
-```
-
-Check if the CLI tools [^manual] set-up properly:
+And now you get a shell at `/root/openabe` directory of the container, check OpenABE version:
 
 ```sh
-$ oabe_setup
+root@xxxxx# oabe_setup         
 # OpenABE command-line: system setup utility, v1.7
 # usage: [ -s scheme ] [ -p prefix ] -v
 
-#         -v : turn on verbose mode
-#         -s : scheme types are 'CP' or 'KP'
-#         -p : prefix string for generated authority public and secret parameter files (optional)
+# 	-v : turn on verbose mode
+# 	-s : scheme types are 'CP' or 'KP'
+# 	-p : prefix string for generated authority public and secret parameter files (optional)
 ```
-
-[^manual]: OpenABE CLI Util Document: https://github.com/zeutro/openabe/blob/master/docs/libopenabe-v1.0.0-cli-doc.pdf
 
 ## Ciphertext-Policy Attribute-based Encryption (CP-ABE)
 
