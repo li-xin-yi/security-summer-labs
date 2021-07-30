@@ -51,14 +51,14 @@ FlowDroid [^1] is a context-, flow-, field-, object-sensitive and lifecycle-awar
 
 [^1]: Arzt, Steven, et al. "[Flowdroid: Precise context, flow, field, object-sensitive and lifecycle-aware taint analysis for android apps.](https://www.bodden.de/pubs/far+14flowdroid.pdf)" *Acm Sigplan Notices* 49.6 (2014): 259-269.
 
-For example, [`Claco.A.apk`](https://github.com/ashishb/android-malware/tree/master/BreakBottleneck/SamplesOfHIP2014TalkBreakBottleneck/Claco.A) [^2] is an Android malicious app that steals text messages, contacts and all SD Card files, and it can also automatically execute downloaded `svchosts.exe` when the phone is connected to the PC in the USB drive emulation mode. `svchosts.exe` can record sounds around the infected PC and upload them to remote servers.
+For example, [`Claco.A.apk`](https://github.com/ashishb/android-malware/raw/master/BreakBottleneck/SamplesOfHIP2014TalkBreakBottleneck/Claco.A/Claco.A.apk) [^2] is an Android malicious app that steals text messages, contacts and all SD Card files, and it can also automatically execute downloaded `svchosts.exe` when the phone is connected to the PC in the USB drive emulation mode. `svchosts.exe` can record sounds around the infected PC and upload them to remote servers.
 
 [^2]: See this slides: [Breaking through the bottleneck: Mobile malware is outbreak spreading like wildfire.](https://hackinparis.com/data/slides/2014/ThomasLeiWang.pdf)
 
 Before running `FlowDroid` with downloaded `Claco.A.apk`, we must specify a  definition file for sources and sinks, which defines what use a default shall be treated as a source of sensitive information and what shall be treated as a sink that can possibly leak sensitive data to the outside world. `SourcesAndSinks.txt` provided by FlowDroid homepage demo is targeted on looking for privacy issues, we can apply it for our example to analyze the data-flow in `Claco.A.apk`:
 
 ```
-$ java -jar soot-infoflow-cmd-jar-with-dependencies.jar -a Claco.A.apk -p $ANDROID_SDK/platforms/ -s SourcesAndSinks.txt
+$ java -jar soot-infoflow-cmd-jar-with-dependencies.jar -a apks/Claco.A.apk -p $ANDROID_SDK/platforms/ -s SourcesAndSinks.txt
 ```
 
 It will give a long report about the analysis result:
@@ -102,7 +102,7 @@ class: hint
 
 Run 
 ```
-java -jar soot-infoflow-cmd-jar-with-dependencies.jar -a reverse_tcp.apk -p $ANDROID_SDK/platforms/ -s SourcesAndSinks.txt
+java -jar soot-infoflow-cmd-jar-with-dependencies.jar -a apks/reverse_tcp.apk -p $ANDROID_SDK/platforms/ -s SourcesAndSinks.txt
 ```
 Yes, there is one data leakage found in last few lines of the outputs:
 ```
