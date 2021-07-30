@@ -2,8 +2,8 @@
 
 ```{toctree}
 :maxdepth: 2
-:caption: HOME
-Set-up (Docker Container) <set-up-container.md>
+:caption: Home
+Get Start <setup.md>
 Lab 3: Fine-grained Access Control with Attribute-based Encryption (ABE) <lab3/readme.md>
 Lab 4: Processing encrypted data with Homomorphic Encryption (HE) <lab4/readme.md>
 Lab 6: Behavior-based Mobile Malware Analysis and Detection <lab6/readme.md>
