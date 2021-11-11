@@ -4,7 +4,9 @@
 In this manual, we focus on how to set up a minimal virtual environment for labs. The lab environments consist of a Ubuntu 20.04 VM (for Lab 3, 4, 6, and 7) and an Android 7.1.1 VM (for Lab 7 and 8). Dependencies for each lab are pre-built in seperate docker containers. To finish our labs, VMs should be installed on [VirtualBox](https://www.virtualbox.org/) and set in one single subnet.
 ```
 
-Download Link: [Dropbox](https://www.dropbox.com/sh/qyve837b4blw2pv/AABnsknKTYFB_yY6qbHKnChta?dl=0) | [Google Drive](https://drive.google.com/drive/folders/1R91YJqPaLiK6xDZp5cD5-Y5jkjj6-z-R?usp=sharing) | [MEGA](https://mega.nz/folder/wsMm0bpb#lIiA4Htz018cLD0V4OmhUw)
+<!-- Download Link: [Dropbox](https://www.dropbox.com/sh/qyve837b4blw2pv/AABnsknKTYFB_yY6qbHKnChta?dl=0) | [Google Drive](https://drive.google.com/drive/folders/1R91YJqPaLiK6xDZp5cD5-Y5jkjj6-z-R?usp=sharing) |-->
+
+[MEGA](https://mega.nz/folder/wsMm0bpb#lIiA4Htz018cLD0V4OmhUw) 
 
 
 You should first install  [VirtualBox](https://www.virtualbox.org/) and Extract `.ova` files for the two VMs from the downloaded `.zip` files. After extracted, the file size:
@@ -16,8 +18,8 @@ You should first install  [VirtualBox](https://www.virtualbox.org/) and Extract 
 
 ### Account Information of this VM
 
-- User name: `summer-lab`
-- Password: `summer`
+- User name: `rescue`
+- Password: `rescue`
 
 ### Create a New VM in VirtualBox
 
